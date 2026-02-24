@@ -43,8 +43,36 @@ const getMovies = async ({ search, genre, minRating, sort, page, limit, autoImpo
         }
     }
 
+    const pipeline = [
+        { $match: query },
+        {
+            $lookup: {
+                from: 'ratings',
+                localField: '_id',
+                foreignField: 'movie',
+                as: 'communityRatings'
+            }
+        },
+        {
+            $addFields: {
+                communityRating: {
+                    $cond: [
+                        { $gt: [{ $size: "$communityRatings" }, 0] },
+                        { $round: [{ $avg: "$communityRatings.score" }, 1] },
+                        0
+                    ]
+                },
+                communityVotes: { $size: "$communityRatings" }
+            }
+        },
+        { $project: { communityRatings: 0 } },
+        { $sort: sortObj },
+        { $skip: skip },
+        { $limit: limitNum }
+    ];
+
     const [movies, total] = await Promise.all([
-        Movie.find(query).sort(sortObj).skip(skip).limit(limitNum),
+        Movie.aggregate(pipeline),
         Movie.countDocuments(query),
     ]);
 
