@@ -82,7 +82,19 @@
         "login_link": "Se connecter",
         "register_link": "S'inscrire",
         "logging_in": "Connexion...",
-        "registering": "Inscription..."
+        "registering": "Inscription...",
+        "login_subtitle": "Connectez-vous pour continuer sur CineView",
+        "register_subtitle": "Créez un compte pour commencer le suivi",
+        "forgot_password": "Mot de passe oublié ?",
+        "rules": {
+            "len": "8+ caract.",
+            "upper": "Majuscule",
+            "lower": "Minuscule",
+            "digit": "Chiffre",
+            "special": "Caract. spécial"
+        },
+        "toast_welcome": "Bon retour, {{name}} !",
+        "toast_register_success": "Compte créé ! 🎉"
     },
     "dashboard": {
         "title": "Mon Espace",

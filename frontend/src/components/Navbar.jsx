@@ -1,9 +1,15 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { User, LogOut, Settings } from 'lucide-react';
 import { useAuthStore } from '../store/auth.store';
-import { useFiltersStore } from '../store/filters.store';
+import { useNavigate, Link } from 'react-router-dom';
+
+// UI Components
+import Logo from './ui/Logo';
+import NavLink from './ui/NavLink';
+import LangButton from './ui/LangButton';
+import Button from './ui/Button';
+import GlassPanel from './ui/GlassPanel';
 
 export default function Navbar() {
     const { t, i18n } = useTranslation();
@@ -11,9 +17,6 @@ export default function Navbar() {
     const navigate = useNavigate();
     const [scrolled, setScrolled] = useState(false);
     const [userMenuOpen, setUserMenuOpen] = useState(false);
-
-    // For local search state that syncs with global store
-    const { search, setSearch } = useFiltersStore();
 
     useEffect(() => {
         const handleScroll = () => {
@@ -29,147 +32,84 @@ export default function Navbar() {
         navigate('/');
     };
 
-
+    const navStyle = {
+        position: 'fixed',
+        top: 0,
+        left: '50%',
+        transform: 'translateX(-50%)',
+        width: '92%',
+        maxWidth: '1400px',
+        zIndex: 100,
+        background: scrolled ? 'rgba(15, 15, 15, 0.85)' : 'rgba(15, 15, 15, 0.4)',
+        backdropFilter: 'blur(20px) saturate(180%)',
+        transition: 'all 0.5s cubic-bezier(0.19, 1, 0.22, 1)',
+        padding: '0 1.5rem',
+        height: scrolled ? '64px' : '82px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginTop: scrolled ? '12px' : '24px',
+        borderRadius: '100px',
+        border: '1px solid rgba(255, 255, 255, 0.12)',
+        boxShadow: scrolled ? '0 30px 60px rgba(0,0,0,0.5)' : '0 10px 40px rgba(0,0,0,0.2)'
+    };
 
     return (
-        <nav
-            style={{
-                position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50,
-                background: scrolled ? 'var(--color-bg-dark)' : 'transparent',
-                transition: 'background-color 0.3s ease',
-                padding: '0 4%',
-                height: '72px',
-                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                borderBottom: scrolled ? '1px solid rgba(255,255,255,0.05)' : 'none'
-            }}
-        >
+        <nav style={navStyle}>
             {/* Left side: Logo & Primary Links */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '3rem' }}>
-                {/* Logo */}
-                <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', outline: 'none' }}>
-                    {/* Red Square Icon similar to mockup */}
-                    <div style={{
-                        width: '24px', height: '24px',
-                        backgroundColor: 'var(--color-accent)',
-                        borderRadius: '4px',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center'
-                    }}>
-                        {/* Could put a small white icon inside, but mockup is just a simple shape */}
-                        <div style={{ width: '12px', height: '12px', background: 'white', borderRadius: '2px', marginLeft: '4px', marginTop: '-4px' }} />
-                    </div>
-                    <span style={{
-                        fontFamily: 'var(--font-family-sans)', fontWeight: 800,
-                        fontSize: '1.4rem', letterSpacing: '-0.03em', color: 'var(--color-white)',
-                    }}>
-                        CineView
-                    </span>
-                </Link>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '2.5rem' }}>
+                <Logo height={scrolled ? '28px' : '36px'} />
 
-                {/* Desktop nav links */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
-                    <Link to="/" style={{ fontSize: '0.9rem', fontWeight: 500, color: 'var(--color-white)' }}>
-                        {t('nav.catalog')}
-                    </Link>
-                    {isAuthenticated && (
-                        <Link to="/dashboard" style={{ fontSize: '0.9rem', fontWeight: 500, color: 'var(--color-neutral-400)' }} onMouseEnter={e => e.currentTarget.style.color = 'white'} onMouseLeave={e => e.currentTarget.style.color = 'var(--color-neutral-400)'}>
-                            {t('nav.dashboard')}
-                        </Link>
-                    )}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <NavLink to="/">{t('nav.catalog')}</NavLink>
                     {isAdmin() && (
-                        <Link to="/admin" style={{ fontSize: '0.9rem', fontWeight: 500, color: 'var(--color-accent)' }} onMouseEnter={e => e.currentTarget.style.color = 'white'} onMouseLeave={e => e.currentTarget.style.color = 'var(--color-accent)'}>
-                            {t('nav.admin')}
-                        </Link>
+                        <NavLink to="/admin" color="var(--color-accent)">{t('nav.admin')}</NavLink>
                     )}
                 </div>
             </div>
 
-            {/* Right side: Search, Notifications, Profile */}
+            {/* Right side: Language, Login/Profile Pill */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
 
-
-
                 {/* Language Toggles */}
-                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginLeft: '0.5rem' }}>
-                    <button
-                        onClick={() => i18n.changeLanguage('fr')}
-                        style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', opacity: i18n.language === 'fr' ? 1 : 0.5, transition: 'opacity 0.2s', padding: 0 }}
-                        title="Français"
-                    >🇫🇷</button>
-                    <button
-                        onClick={() => i18n.changeLanguage('en')}
-                        style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', opacity: i18n.language === 'en' ? 1 : 0.5, transition: 'opacity 0.2s', padding: 0 }}
-                        title="English"
-                    >🇬🇧</button>
+                <div style={{
+                    display: 'flex', gap: '0.4rem', alignItems: 'center',
+                    background: 'rgba(255,255,255,0.03)', padding: '0.2rem 0.6rem',
+                    borderRadius: '20px', border: '1px solid rgba(255,255,255,0.06)'
+                }}>
+                    <LangButton lang="fr" current={i18n.language} onClick={() => i18n.changeLanguage('fr')} title="Français" />
+                    <LangButton lang="en" current={i18n.language} onClick={() => i18n.changeLanguage('en')} title="English" />
                 </div>
 
                 {isAuthenticated ? (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
-                        {/* Profil Menu */}
+                    <div style={{ position: 'relative' }}>
+                        <Button
+                            pill
+                            variant="primary"
+                            size="sm"
+                            onClick={() => setUserMenuOpen(!userMenuOpen)}
+                            style={{ padding: '0.4rem 0.6rem 0.4rem 1.25rem', display: 'flex', alignItems: 'center', gap: '0.75rem', background: 'white', color: 'black' }}
+                        >
+                            <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>{t('nav.dashboard')}</span>
+                            <UserAvatar />
+                        </Button>
 
-                        {/* Profile Menu */}
-                        <div style={{ position: 'relative' }}>
-                            <button
-                                onClick={() => setUserMenuOpen(!userMenuOpen)}
-                                style={{
-                                    background: 'transparent', border: 'none', padding: 0,
-                                    cursor: 'pointer', display: 'flex', alignItems: 'center'
-                                }}
-                            >
-                                <div style={{
-                                    width: '36px', height: '36px', borderRadius: '50%',
-                                    background: 'url("https://api.dicebear.com/7.x/avataaars/svg?seed=Felix&backgroundColor=e50914") center/cover',
-                                    border: '2px solid transparent',
-                                    transition: 'border-color 0.2s'
-                                }} onMouseEnter={e => e.currentTarget.style.borderColor = 'white'} onMouseLeave={e => e.currentTarget.style.borderColor = 'transparent'} />
-                            </button>
-
-                            {userMenuOpen && (
-                                <div
-                                    style={{
-                                        position: 'absolute', right: 0, top: 'calc(100% + 12px)',
-                                        minWidth: '220px', zIndex: 100,
-                                        backgroundColor: 'var(--color-bg-elevated)', border: '1px solid var(--color-neutral-800)',
-                                        borderRadius: 'var(--radius-md)',
-                                        padding: '0.5rem 0',
-                                        boxShadow: '0 10px 30px rgba(0,0,0,0.5)'
-                                    }}
-                                >
-                                    <div style={{ padding: '0.5rem 1rem', fontSize: '0.85rem', color: 'var(--color-neutral-400)', borderBottom: '1px solid var(--color-neutral-800)', marginBottom: '0.5rem' }}>
-                                        <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t('nav.dashboard')}</div>
-                                        <strong style={{ color: 'white' }}>{user?.email}</strong>
-                                    </div>
-                                    <NavMenuItem icon={<User size={16} />} label={t('nav.dashboard')} to="/dashboard" onClick={() => setUserMenuOpen(false)} />
-                                    {isAdmin() && (
-                                        <NavMenuItem icon={<Settings size={16} />} label={t('nav.admin')} to="/admin" onClick={() => setUserMenuOpen(false)} />
-                                    )}
-                                    <hr style={{ border: 'none', borderTop: '1px solid var(--color-neutral-800)', margin: '0.5rem 0' }} />
-                                    <button
-                                        onClick={handleLogout}
-                                        style={{
-                                            display: 'flex', alignItems: 'center', gap: '0.6rem',
-                                            width: '100%', padding: '0.6rem 1rem',
-                                            border: 'none', background: 'transparent', color: 'var(--color-neutral-200)',
-                                            cursor: 'pointer', fontSize: '0.9rem', fontWeight: 500,
-                                            textAlign: 'left'
-                                        }}
-                                        onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.color = 'white' }}
-                                        onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--color-neutral-200)' }}
-                                    >
-                                        <LogOut size={16} />
-                                        {t('nav.logout')}
-                                    </button>
-                                </div>
-                            )}
-                        </div>
+                        {userMenuOpen && (
+                            <UserMenu
+                                user={user}
+                                isAdmin={isAdmin()}
+                                onLogout={handleLogout}
+                                t={t}
+                                onClose={() => setUserMenuOpen(false)}
+                            />
+                        )}
                     </div>
                 ) : (
-                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                        <Link to="/login" style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--color-white)' }}>
-                            {t('nav.login')}
-                        </Link>
-                        <Link to="/register" className="btn-primary" style={{ padding: '0.5rem 1.25rem', borderRadius: 'var(--radius-pill)' }}>
+                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                        <NavLink to="/login">{t('nav.login')}</NavLink>
+                        <Button to="/register" pill size="sm">
                             {t('nav.register')}
-                        </Link>
+                        </Button>
                     </div>
                 )}
             </div>
@@ -178,25 +118,103 @@ export default function Navbar() {
             {userMenuOpen && (
                 <div style={{ position: 'fixed', inset: 0, zIndex: 40 }} onClick={() => setUserMenuOpen(false)} />
             )}
+
+            <style>{`
+                @keyframes slideIn {
+                    from { opacity: 0; transform: translateY(10px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+            `}</style>
         </nav>
     );
 }
 
-function NavMenuItem({ icon, label, to, onClick }) {
+// Internal Sub-components for cleaner structure
+function UserAvatar() {
     return (
-        <Link
-            to={to}
-            onClick={onClick}
-            style={{
-                display: 'flex', alignItems: 'center', gap: '0.6rem',
-                padding: '0.5rem 1rem', color: 'var(--color-neutral-200)',
-                fontSize: '0.9rem', fontWeight: 500, transition: 'all 0.2s'
-            }}
-            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.color = 'white' }}
-            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--color-neutral-200)' }}
-        >
-            {icon}
-            {label}
-        </Link>
+        <div style={{
+            width: '28px', height: '28px', borderRadius: '50%',
+            background: 'url("https://api.dicebear.com/7.x/avataaars/svg?seed=Felix&backgroundColor=e50914") center/cover',
+        }} />
+    );
+}
+
+function UserMenu({ user, isAdmin, onLogout, t, onClose }) {
+    const itemStyle = {
+        width: '100%',
+        padding: '0.8rem 1.25rem',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '1rem',
+        border: 'none',
+        background: 'transparent',
+        color: 'var(--color-neutral-200)',
+        fontSize: '0.9rem',
+        fontWeight: 700,
+        textAlign: 'left',
+        cursor: 'pointer',
+        transition: 'all 0.2s ease',
+        textDecoration: 'none',
+        boxSizing: 'border-box'
+    };
+
+    const handleHover = (e, isEnter) => {
+        e.currentTarget.style.background = isEnter ? 'rgba(255, 255, 255, 0.05)' : 'transparent';
+        e.currentTarget.style.color = isEnter ? 'white' : 'var(--color-neutral-200)';
+    };
+
+    return (
+        <GlassPanel padding="1rem 0" borderRadius="1.25rem" style={{
+            position: 'absolute', right: '10px', top: 'calc(100% + 15px)',
+            minWidth: '260px', zIndex: 100,
+            boxShadow: '0 30px 70px rgba(0,0,0,0.7)',
+            overflow: 'hidden',
+            animation: 'slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+            border: '1px solid rgba(255,255,255,0.12)'
+        }}>
+            {/* Header: User Email */}
+            <div style={{
+                padding: '0.5rem 1.25rem 1rem',
+                fontSize: '0.85rem',
+                borderBottom: '1px solid rgba(255,255,255,0.06)',
+                marginBottom: '0.5rem'
+            }}>
+                <div style={{ fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.12em', fontWeight: 800, color: 'var(--color-neutral-500)', marginBottom: '0.3rem' }}>{t('nav.profile', 'PROFIL')}</div>
+                <div style={{ color: 'white', fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user?.email}</div>
+            </div>
+
+            {/* Menu Links */}
+            <Link to="/dashboard" onClick={onClose} style={itemStyle} onMouseEnter={e => handleHover(e, true)} onMouseLeave={e => handleHover(e, false)}>
+                <User size={18} style={{ opacity: 0.8 }} />
+                <span>{t('nav.dashboard')}</span>
+            </Link>
+
+            {isAdmin && (
+                <Link to="/admin" onClick={onClose} style={itemStyle} onMouseEnter={e => handleHover(e, true)} onMouseLeave={e => handleHover(e, false)}>
+                    <Settings size={18} style={{ opacity: 0.8 }} />
+                    <span>{t('nav.admin')}</span>
+                </Link>
+            )}
+
+            <hr style={{ border: 'none', borderTop: '1px solid rgba(255,255,255,0.06)', margin: '0.5rem 0' }} />
+
+            {/* Logout Button */}
+            <button
+                onClick={onLogout}
+                style={{ ...itemStyle, color: '#ff4d4d' }}
+                onMouseEnter={e => {
+                    handleHover(e, true);
+                    e.currentTarget.style.background = 'rgba(255, 77, 77, 0.08)';
+                    e.currentTarget.style.color = '#ff4d4d';
+                }}
+                onMouseLeave={e => {
+                    handleHover(e, false);
+                    e.currentTarget.style.color = '#ff4d4d';
+                }}
+            >
+                <LogOut size={18} style={{ opacity: 0.9 }} />
+                <span>{t('nav.logout')}</span>
+            </button>
+        </GlassPanel>
     );
 }

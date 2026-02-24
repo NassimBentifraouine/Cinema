@@ -75,7 +75,19 @@
         "login_link": "Login",
         "register_link": "Sign up",
         "logging_in": "Logging in...",
-        "registering": "Signing up..."
+        "registering": "Signing up...",
+        "login_subtitle": "Sign in to continue to CineView",
+        "register_subtitle": "Create an account to start tracking",
+        "forgot_password": "Forgot password?",
+        "rules": {
+            "len": "8+ chars",
+            "upper": "Uppercase",
+            "lower": "Lowercase",
+            "digit": "Number",
+            "special": "Special char"
+        },
+        "toast_welcome": "Welcome back, {{name}}!",
+        "toast_register_success": "Account created! 🎉"
     },
     "dashboard": {
         "title": "My Space",

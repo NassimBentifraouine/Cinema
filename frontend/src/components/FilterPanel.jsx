@@ -2,6 +2,11 @@ import { useTranslation } from 'react-i18next';
 import { SlidersHorizontal, Search } from 'lucide-react';
 import { useFiltersStore } from '../store/filters.store';
 
+// UI Components
+import GlassPanel from './ui/GlassPanel';
+import Input from './ui/Input';
+import Button from './ui/Button';
+
 const GENRES = [
     'Action', 'Adventure', 'Animation', 'Biography', 'Comedy',
     'Crime', 'Documentary', 'Drama', 'Fantasy', 'Horror',
@@ -15,15 +20,7 @@ export default function FilterPanel() {
     const hasFilters = search || genre || minRating || sort;
 
     return (
-        <div style={{
-            backgroundColor: 'var(--color-bg-card)',
-            border: '1px solid var(--color-neutral-800)',
-            borderRadius: 'var(--radius-lg)',
-            padding: '1.5rem',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '2rem'
-        }}>
+        <GlassPanel padding="1.5rem" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
             {/* Header */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                 <SlidersHorizontal size={20} color="var(--color-accent)" />
@@ -31,31 +28,16 @@ export default function FilterPanel() {
             </div>
 
             {/* Search */}
-            <div>
-                <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-neutral-400)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>
-                    {t('catalog.search_placeholder', 'Search Movies')}
-                </label>
-                <div style={{ position: 'relative' }}>
-                    <Search size={16} color="var(--color-neutral-400)" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
-                    <input
-                        type="text"
-                        placeholder="Inception, Dark Knight..."
-                        value={search || ''}
-                        onChange={(e) => setSearch(e.target.value)}
-                        style={{
-                            width: '100%',
-                            backgroundColor: 'var(--color-bg-dark)',
-                            border: '1px solid var(--color-neutral-800)',
-                            borderRadius: 'var(--radius-sm)',
-                            padding: '0.8rem 1rem 0.8rem 2.5rem',
-                            color: 'white',
-                            fontSize: '0.9rem',
-                            outline: 'none',
-                        }}
-                        onFocus={e => { e.target.style.borderColor = 'rgba(255,255,255,0.2)' }}
-                        onBlur={e => { e.target.style.borderColor = 'var(--color-neutral-800)' }}
-                    />
-                </div>
+            <div style={{ marginBottom: '-1rem' }}>
+                <Input
+                    id="filter-search"
+                    label={t('catalog.search_placeholder', 'Search Movies')}
+                    icon={Search}
+                    placeholder="Inception, Dark Knight..."
+                    value={search || ''}
+                    onChange={(e) => setSearch(e.target.value)}
+                    marginBottom="0"
+                />
             </div>
 
             {/* Category */}
@@ -164,27 +146,13 @@ export default function FilterPanel() {
             </div>
 
             {/* Apply Filters Button */}
-            <button
-                onClick={() => { }} // Technically state is already updated via store, but button exists visually
-                style={{
-                    width: '100%',
-                    padding: '0.8rem',
-                    backgroundColor: 'transparent',
-                    border: '1px solid var(--color-accent)',
-                    color: 'var(--color-accent)',
-                    borderRadius: 'var(--radius-sm)',
-                    fontWeight: 700,
-                    fontSize: '0.85rem',
-                    letterSpacing: '0.05em',
-                    marginTop: '0.5rem',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s'
-                }}
-                onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'var(--color-accent-muted)'; }}
-                onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+            <Button
+                variant="outline"
+                style={{ width: '100%', marginTop: '0.5rem' }}
+                onClick={() => { }}
             >
                 {t('catalog.apply_filters', 'APPLY FILTERS')}
-            </button>
+            </Button>
 
             {/* Soft Reset hint if applied */}
             {hasFilters && (
@@ -192,12 +160,12 @@ export default function FilterPanel() {
                     onClick={resetFilters}
                     style={{
                         background: 'transparent', border: 'none', color: 'var(--color-neutral-400)',
-                        fontSize: '0.75rem', cursor: 'pointer', textDecoration: 'underline'
+                        fontSize: '0.75rem', cursor: 'pointer', textDecoration: 'underline', alignSelf: 'center'
                     }}
                 >
                     {t('catalog.clear_all', 'Clear all')}
                 </button>
             )}
-        </div>
+        </GlassPanel>
     );
 }

@@ -3,6 +3,10 @@ import { Star, Heart } from 'lucide-react';
 import { useAuthStore } from '../store/auth.store';
 import { useTranslation } from 'react-i18next';
 
+// UI Components
+import GlassPanel from './ui/GlassPanel';
+import Button from './ui/Button';
+
 const PLACEHOLDER_POSTER = 'https://via.placeholder.com/300x450/141414/8888aa?text=No+Poster';
 
 export default function MovieCard({ movie, isFavorite, onToggleFavorite, variant = 'grid' }) {
@@ -19,12 +23,7 @@ export default function MovieCard({ movie, isFavorite, onToggleFavorite, variant
 
     if (variant === 'list') {
         return (
-            <div style={{
-                display: 'flex', gap: '1.5rem', alignItems: 'center',
-                background: 'var(--color-bg-card)', padding: '1rem',
-                borderRadius: 'var(--radius-md)', border: '1px solid var(--color-neutral-800)',
-                transition: 'border-color 0.2s'
-            }} className="group hover:border-neutral-600">
+            <GlassPanel padding="1rem" style={{ display: 'flex', gap: '1.5rem', alignItems: 'center', transition: 'border-color 0.2s' }} className="group hover:border-neutral-600">
                 <Link to={`/movie/${movie.imdbId || movie._id}`} style={{ flexShrink: 0, width: '100px', aspectRatio: '2/3', overflow: 'hidden', borderRadius: '4px' }}>
                     <img src={posterSrc} alt={displayTitle} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </Link>
@@ -54,14 +53,16 @@ export default function MovieCard({ movie, isFavorite, onToggleFavorite, variant
                     </p>
                 </div>
                 {isAuthenticated && onToggleFavorite && (
-                    <button
+                    <Button
+                        variant="ghost"
+                        padding="0.5rem"
                         onClick={(e) => { e.preventDefault(); onToggleFavorite(movie._id); }}
-                        style={{ background: 'none', border: 'none', color: isFavorite ? 'var(--color-accent)' : 'var(--color-neutral-600)', cursor: 'pointer', padding: '0.5rem' }}
+                        style={{ color: isFavorite ? 'var(--color-accent)' : 'var(--color-neutral-600)' }}
                     >
                         <Heart size={20} fill={isFavorite ? 'currentColor' : 'none'} />
-                    </button>
+                    </Button>
                 )}
-            </div>
+            </GlassPanel>
         );
     }
 
@@ -94,37 +95,38 @@ export default function MovieCard({ movie, isFavorite, onToggleFavorite, variant
 
                 {/* Top Right Rating Badge */}
                 {movie.imdbRating > 0 && (
-                    <div style={{
-                        position: 'absolute', top: '0.5rem', right: '0.5rem',
-                        backgroundColor: 'rgba(0,0,0,0.8)',
-                        backdropFilter: 'blur(4px)',
-                        padding: '0.2rem 0.5rem',
-                        borderRadius: '4px',
-                        display: 'flex', alignItems: 'center', gap: '0.25rem'
-                    }}>
+                    <GlassPanel
+                        padding="0.2rem 0.5rem"
+                        borderRadius="4px"
+                        style={{ position: 'absolute', top: '0.5rem', right: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}
+                    >
                         <Star size={10} fill="var(--color-gold)" color="var(--color-gold)" />
                         <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'white' }}>
                             {movie.imdbRating.toFixed(1)}
                         </span>
-                    </div>
+                    </GlassPanel>
                 )}
 
                 {/* Favorite button (if authenticated) */}
                 {isAuthenticated && onToggleFavorite && (
-                    <button
+                    <Button
+                        variant="ghost"
+                        pill
                         onClick={(e) => { e.preventDefault(); onToggleFavorite(movie._id); }}
                         aria-label={isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}
                         style={{
                             position: 'absolute', bottom: '0.5rem', right: '0.5rem',
-                            padding: '0.4rem', cursor: 'pointer', display: 'flex', alignItems: 'center',
-                            justifyContent: 'center', backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                            transition: 'all 0.2s', borderRadius: '50%', border: '1px solid rgba(255,255,255,0.2)',
-                            opacity: 0, transform: 'translateY(10px)'
+                            padding: '0.4rem',
+                            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                            transition: 'all 0.2s',
+                            border: '1px solid rgba(255,255,255,0.2)',
+                            opacity: 0, transform: 'translateY(10px)',
+                            minWidth: 'auto'
                         }}
                         className="group-hover:opacity-100 group-hover:-translate-y-0"
                     >
                         <Heart size={16} fill={isFavorite ? 'var(--color-accent)' : 'none'} color={isFavorite ? 'var(--color-accent)' : 'white'} />
-                    </button>
+                    </Button>
                 )}
             </div>
 
