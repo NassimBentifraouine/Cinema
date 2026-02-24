@@ -10,6 +10,7 @@ export default function MovieCard({ movie, isFavorite, onToggleFavorite, variant
     const { i18n } = useTranslation();
     const isEn = i18n.language === 'en';
     const displayTitle = (isEn && movie.titleVO) ? movie.titleVO : movie.title;
+    const displayPlot = (isEn && movie.plotVO) ? movie.plotVO : movie.plot;
     const displayGenre = (isEn && movie.genreVO?.length > 0) ? movie.genreVO : movie.genre;
 
     const posterSrc = movie.customPoster
@@ -49,7 +50,7 @@ export default function MovieCard({ movie, isFavorite, onToggleFavorite, variant
                         )}
                     </div>
                     <p className="line-clamp-2" style={{ fontSize: '0.85rem', color: 'var(--color-neutral-300)', margin: 0, lineHeight: 1.5 }}>
-                        {movie.plot}
+                        {displayPlot}
                     </p>
                 </div>
                 {isAuthenticated && onToggleFavorite && (
