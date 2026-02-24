@@ -26,25 +26,27 @@ export default function App() {
     <BrowserRouter>
       <div style={{ minHeight: '100vh', background: 'var(--color-bg-dark)' }}>
         <Navbar />
-        <Suspense fallback={<LoadingFallback />}>
-          <Routes>
-            <Route path="/" element={<CataloguePage />} />
-            <Route path="/movie/:id" element={<MovieDetailPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="/dashboard" element={
-              <ProtectedRoute>
-                <MemberDashboard />
-              </ProtectedRoute>
-            } />
-            <Route path="/admin" element={
-              <ProtectedRoute adminOnly>
-                <AdminDashboard />
-              </ProtectedRoute>
-            } />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </Suspense>
+        <main style={{ minHeight: '100vh' }}>
+          <Suspense fallback={<LoadingFallback />}>
+            <Routes>
+              <Route path="/" element={<CataloguePage />} />
+              <Route path="/movie/:id" element={<MovieDetailPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+              <Route path="/dashboard" element={
+                <ProtectedRoute>
+                  <MemberDashboard />
+                </ProtectedRoute>
+              } />
+              <Route path="/admin" element={
+                <ProtectedRoute adminOnly>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              } />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </Suspense>
+        </main>
         <Toaster />
       </div>
     </BrowserRouter>

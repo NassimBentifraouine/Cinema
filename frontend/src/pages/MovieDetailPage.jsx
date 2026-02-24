@@ -8,6 +8,10 @@ import StarRating from '../components/StarRating';
 import { useAuthStore } from '../store/auth.store';
 import { useToast } from '../components/ui/Toaster';
 
+// UI Components
+import GlassPanel from '../components/ui/GlassPanel';
+import Button from '../components/ui/Button';
+
 const PLACEHOLDER_POSTER = 'https://via.placeholder.com/400x600/141414/8888aa?text=No+Poster';
 const AVATAR_PLACEHOLDER = 'https://api.dicebear.com/7.x/notionists/svg?seed=';
 
@@ -136,7 +140,7 @@ export default function MovieDetailPage() {
     return (
         <main className="animate-fade-in-slow" style={{ minHeight: '100vh', paddingBottom: '4rem' }}>
             {/* Top Background Hero Section */}
-            <div style={{ position: 'relative', width: '100%', height: '80vh', minHeight: '600px', overflow: 'hidden' }}>
+            <div style={{ position: 'relative', width: '100%', height: '70vh', minHeight: '550px', overflow: 'hidden' }}>
                 <div
                     style={{
                         position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
@@ -156,7 +160,7 @@ export default function MovieDetailPage() {
             </div>
 
             {/* Main Content overlapping the hero */}
-            <div style={{ maxWidth: '1400px', margin: '-50vh auto 0', padding: '0 4%', position: 'relative', zIndex: 10 }}>
+            <div style={{ maxWidth: '1400px', margin: '-45vh auto 0', padding: '0 4%', position: 'relative', zIndex: 10 }}>
 
                 {/* Top Section Layout: Poster on left, Info on right */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'minmax(300px, 350px) 1fr', gap: '5rem', alignItems: 'end', marginBottom: '5rem' }}>
@@ -188,17 +192,9 @@ export default function MovieDetailPage() {
 
                         {/* Breadcrumbs-ish / Meta */}
                         <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem', flexWrap: 'wrap', marginBottom: '2rem', fontWeight: 700, fontSize: '0.85rem', letterSpacing: '0.05em' }}>
-                            <div style={{
-                                backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                                backdropFilter: 'blur(10px)',
-                                color: 'var(--color-accent)',
-                                padding: '0.4rem 0.8rem',
-                                borderRadius: '4px',
-                                border: '1px solid rgba(255, 255, 255, 0.1)',
-                                textTransform: 'uppercase'
-                            }}>
+                            <GlassPanel padding="0.4rem 0.8rem" borderRadius="var(--radius-sm)" style={{ color: 'var(--color-accent)', fontWeight: 700, textTransform: 'uppercase', fontSize: '0.85rem' }}>
                                 {displayGenre?.length > 0 ? displayGenre.join(' / ') : 'MOVIE'}
-                            </div>
+                            </GlassPanel>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-neutral-300)' }}>
                                 <Calendar size={16} color="var(--color-accent)" />
                                 {movie.year || 'N/A'}
@@ -278,48 +274,19 @@ export default function MovieDetailPage() {
                             {/* Actions Column */}
                             {isAuthenticated && (
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', minWidth: '350px' }}>
-                                    <button
+                                    <Button
                                         onClick={handleToggleFavorite}
                                         disabled={savingFav}
-                                        style={{
-                                            padding: '1.2rem 2.5rem',
-                                            fontSize: '1rem',
-                                            fontWeight: 800,
-                                            letterSpacing: '0.05em',
-                                            textTransform: 'uppercase',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            gap: '0.8rem',
-                                            backgroundColor: isFavorite ? 'transparent' : 'var(--color-accent)',
-                                            color: 'white',
-                                            border: isFavorite ? '2px solid rgba(255,255,255,0.2)' : 'none',
-                                            borderRadius: '4px',
-                                            cursor: 'pointer',
-                                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                                            boxShadow: isFavorite ? 'none' : '0 10px 20px rgba(229, 9, 20, 0.3)'
-                                        }}
-                                        onMouseEnter={e => {
-                                            if (!isFavorite) e.currentTarget.style.transform = 'translateY(-2px)';
-                                            else e.currentTarget.style.borderColor = 'rgba(255,255,255,0.5)';
-                                        }}
-                                        onMouseLeave={e => {
-                                            if (!isFavorite) e.currentTarget.style.transform = 'translateY(0)';
-                                            else e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)';
-                                        }}
+                                        variant={isFavorite ? 'ghost' : 'primary'}
+                                        size="lg"
+                                        icon={Heart}
+                                        style={{ width: '100%', border: isFavorite ? '2px solid rgba(255,255,255,0.2)' : 'none' }}
                                     >
-                                        {isFavorite ? <Heart size={22} fill="white" /> : <Heart size={22} />}
                                         {isFavorite ? t('movie.in_watchlist') : t('movie.add_to_watchlist')}
-                                    </button>
+                                    </Button>
 
                                     {/* Mini Rating Module */}
-                                    <div style={{
-                                        border: '1px solid rgba(255,255,255,0.05)',
-                                        padding: '1.5rem', borderRadius: '8px',
-                                        backgroundColor: 'rgba(255,255,255,0.02)',
-                                        backdropFilter: 'blur(5px)',
-                                        display: 'flex', flexDirection: 'column', gap: '1rem'
-                                    }}>
+                                    <GlassPanel padding="1.5rem" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                             <h3 style={{ margin: 0, fontSize: '0.8rem', fontWeight: 800, textTransform: 'uppercase', color: 'var(--color-neutral-400)', letterSpacing: '0.1em' }}>{t('movie.rate_movie')}</h3>
                                             {userRating > 0 && (
@@ -337,7 +304,7 @@ export default function MovieDetailPage() {
                                             )}
                                         </div>
                                         <StarRating value={userRating} onChange={ratingLoading ? undefined : handleRate} max={10} size={24} />
-                                    </div>
+                                    </GlassPanel>
                                 </div>
                             )}
                         </div>
@@ -345,14 +312,15 @@ export default function MovieDetailPage() {
                 </div>
 
                 {/* Bottom Content Section */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.6fr) minmax(0, 1fr)', gap: '6rem' }}>
-
-                    {/* Left: Plot & Info */}
-                    <div style={{ maxWidth: '800px' }}>
+                <div style={{ marginTop: '4rem' }}>
+                    {/* Full Width: Plot & Info */}
+                    <div>
                         <div style={{ marginBottom: '4rem' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.8rem' }}>
-                                <div style={{ width: '40px', height: '2px', backgroundColor: 'var(--color-accent)' }} />
-                                <h2 style={{ fontSize: '1.2rem', fontWeight: 900, margin: 0, textTransform: 'uppercase', letterSpacing: '0.1em' }}>{t('movie.plot')}</h2>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
+                                <div style={{ width: '32px', height: '2px', backgroundColor: 'var(--color-accent)' }} />
+                                <h2 style={{ fontSize: '1.25rem', fontWeight: 900, margin: 0, textTransform: 'uppercase', letterSpacing: '0.15em', color: 'white' }}>
+                                    {t('movie.plot')}
+                                </h2>
                             </div>
                             <p style={{
                                 color: 'var(--color-neutral-200)',
@@ -366,20 +334,6 @@ export default function MovieDetailPage() {
                         </div>
 
                         <CommentSection movieId={movie._id} />
-                    </div>
-
-                    {/* Right: Technical or Additional info could go here, for now empty or refined sidebar */}
-                    <div style={{ padding: '2rem', borderLeft: '1px solid rgba(255,255,255,0.05)' }}>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-                            <div>
-                                <h4 style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--color-neutral-500)', textTransform: 'uppercase', marginBottom: '0.8rem', letterSpacing: '0.1em' }}>{t('movie.details')}</h4>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', fontSize: '0.9rem' }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: 'var(--color-neutral-400)' }}>Status</span> <span style={{ color: 'white', fontWeight: 600 }}>Released</span></div>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: 'var(--color-neutral-400)' }}>Type</span> <span style={{ color: 'white', fontWeight: 600 }}>Feature Film</span></div>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: 'var(--color-neutral-400)' }}>Language</span> <span style={{ color: 'white', fontWeight: 600 }}>{displayLanguage || 'English'}</span></div>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>

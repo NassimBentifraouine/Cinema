@@ -6,6 +6,9 @@ import { userApi } from '../lib/api';
 import { useAuthStore } from '../store/auth.store';
 import StarRating from '../components/StarRating';
 
+// UI Components
+import GlassPanel from '../components/ui/GlassPanel';
+
 const TABS = [
     { key: 'favorites', icon: <Heart size={16} /> },
     { key: 'ratings', icon: <Star size={16} /> },
@@ -34,15 +37,39 @@ export default function MemberDashboard() {
     }, []);
 
     return (
-        <main style={{ maxWidth: '1100px', margin: '0 auto', padding: '2rem 1.5rem', position: 'relative' }} className="animate-fade-in">
-            {/* Header */}
-            <div style={{ marginBottom: '2.5rem' }}>
-                <h1 style={{ margin: '0 0 0.5rem', fontSize: '2.5rem', fontWeight: 900, fontFamily: 'var(--font-family-heading)', letterSpacing: '-0.02em' }}>{t('dashboard.title')}</h1>
-                <p style={{ margin: 0, color: 'var(--color-neutral-400)', fontSize: '0.95rem' }}>{user?.email}</p>
-            </div>
+        <main style={{ width: '92%', maxWidth: '1400px', margin: '0 auto', padding: '160px 0 4rem', position: 'relative' }} className="animate-fade-in">
+            {/* Page Header */}
+            <header style={{ marginBottom: '3.5rem', textAlign: 'left' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.5rem' }}>
+                    <div style={{ width: '32px', height: '2px', backgroundColor: 'var(--color-accent)' }} />
+                    <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--color-accent)', letterSpacing: '0.2em', textTransform: 'uppercase' }}>
+                        {t('dashboard.user_space', 'USER SPACE')}
+                    </span>
+                </div>
+                <h1 style={{
+                    margin: 0,
+                    fontSize: '3rem',
+                    fontWeight: 950,
+                    letterSpacing: '-0.04em',
+                    lineHeight: 1.1,
+                    color: 'white',
+                    fontFamily: 'var(--font-family-heading)'
+                }}>
+                    {t('dashboard.title')}
+                </h1>
+                <p style={{ margin: '0.75rem 0 0', color: 'var(--color-neutral-400)', fontSize: '1rem', fontWeight: 500 }}>
+                    {user?.email}
+                </p>
+            </header>
 
-            {/* Tabs */}
-            <div className="glass-panel" style={{ display: 'flex', gap: '0.4rem', marginBottom: '2rem', padding: '0.5rem', borderRadius: 'var(--radius-xl)', width: 'fit-content', border: '1px solid rgba(255,255,255,0.05)' }}>
+            {/* Tabs Navigation */}
+            <div style={{
+                display: 'flex',
+                gap: '2.5rem',
+                marginBottom: '3rem',
+                borderBottom: '1px solid rgba(255,255,255,0.06)',
+                paddingBottom: '0.2rem'
+            }}>
                 {TABS.map(({ key, icon }) => (
                     <button
                         key={key}
@@ -50,18 +77,50 @@ export default function MemberDashboard() {
                         role="tab"
                         aria-selected={tab === key}
                         style={{
-                            display: 'flex', alignItems: 'center', gap: '0.4rem',
-                            padding: '0.6rem 1.25rem', borderRadius: 'var(--radius-lg)',
-                            border: 'none', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 700,
-                            fontFamily: 'var(--font-family-heading)',
-                            background: tab === key ? 'var(--color-accent)' : 'transparent',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.6rem',
+                            padding: '0.8rem 0',
+                            background: 'none',
+                            border: 'none',
+                            cursor: 'pointer',
+                            position: 'relative',
                             color: tab === key ? 'white' : 'var(--color-neutral-400)',
-                            transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                            boxShadow: tab === key ? '0 4px 12px rgba(229, 9, 20, 0.3)' : 'none',
+                            transition: 'color 0.3s ease'
                         }}
                     >
-                        {icon}
-                        {t(`dashboard.${key}`)}
+                        <span style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            opacity: tab === key ? 1 : 0.6,
+                            color: tab === key ? 'var(--color-accent)' : 'inherit'
+                        }}>
+                            {icon}
+                        </span>
+                        <span style={{
+                            fontSize: '0.85rem',
+                            fontWeight: 800,
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.12em',
+                            fontFamily: 'var(--font-family-heading)'
+                        }}>
+                            {t(`dashboard.${key}`)}
+                        </span>
+
+                        {/* Active Underline Indicator */}
+                        {tab === key && (
+                            <div style={{
+                                position: 'absolute',
+                                bottom: '-1px',
+                                left: 0,
+                                right: 0,
+                                height: '2px',
+                                background: 'var(--color-accent)',
+                                boxShadow: '0 0 12px var(--color-accent)',
+                                borderRadius: '2px'
+                            }} className="animate-scale-x" />
+                        )}
                     </button>
                 ))}
             </div>
@@ -87,10 +146,10 @@ export default function MemberDashboard() {
 function FavoritesGrid({ favorites, t }) {
     if (!favorites.length) return <EmptyState icon={<Heart size={40} />} msg={t('dashboard.no_favorites')} />;
     return (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: '1rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '2rem' }}>
             {favorites.map(movie => (
                 <Link key={movie._id} to={`/movie/${movie.imdbId || movie._id}`}>
-                    <div className="glass-panel" style={{ borderRadius: 'var(--radius-xl)', overflow: 'hidden', transition: 'transform 0.3s, box-shadow 0.3s' }}
+                    <GlassPanel padding="0" borderRadius="var(--radius-xl)" style={{ overflow: 'hidden', transition: 'transform 0.3s, box-shadow 0.3s' }}
                         onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = '0 12px 24px rgba(0,0,0,0.5)'; }}
                         onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; }}
                     >
@@ -99,7 +158,7 @@ function FavoritesGrid({ favorites, t }) {
                             <p style={{ margin: 0, fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-neutral-100)', fontFamily: 'var(--font-family-heading)', lineHeight: 1.2 }} className="line-clamp-2">{movie.title}</p>
                             {movie.year && <p style={{ margin: '0.3rem 0 0', fontSize: '0.75rem', color: 'var(--color-neutral-400)' }}>{movie.year}</p>}
                         </div>
-                    </div>
+                    </GlassPanel>
                 </Link>
             ))}
         </div>
@@ -109,9 +168,9 @@ function FavoritesGrid({ favorites, t }) {
 function RatingsList({ ratings, t }) {
     if (!ratings.length) return <EmptyState icon={<Star size={40} />} msg={t('dashboard.no_ratings')} />;
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             {ratings.map(r => (
-                <div key={r._id} className="glass-panel" style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', padding: '1rem', borderRadius: 'var(--radius-xl)' }}>
+                <GlassPanel key={r._id} padding="1rem" borderRadius="var(--radius-xl)" style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
                     {r.movie?.poster && <img src={r.movie.poster} alt={r.movie.title} style={{ width: '56px', height: '84px', objectFit: 'cover', borderRadius: 'var(--radius-md)', border: '1px solid rgba(255,255,255,0.1)' }} />}
                     <div style={{ flex: 1 }}>
                         <Link to={`/movie/${r.movie?.imdbId || r.movie?._id}`}>
@@ -120,7 +179,7 @@ function RatingsList({ ratings, t }) {
                         <StarRating value={r.score} max={10} readOnly size={16} />
                         <p style={{ margin: '0.4rem 0 0', fontSize: '0.8rem', color: 'var(--color-neutral-400)', fontWeight: 500 }}>{t('dashboard.my_rating', { score: r.score })}</p>
                     </div>
-                </div>
+                </GlassPanel>
             ))}
         </div>
     );
@@ -129,7 +188,7 @@ function RatingsList({ ratings, t }) {
 function HistoryList({ history, t }) {
     if (!history.length) return <EmptyState icon={<Clock size={40} />} msg={t('dashboard.no_history')} />;
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
             {history.map(h => (
                 <Link key={h._id} to={`/movie/${h.movie?.imdbId || h.movie?._id}`}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '0.85rem 1rem', background: 'var(--color-bg-card)', borderRadius: 'var(--radius-md)', border: '1px solid rgba(255,255,255,0.05)', transition: 'background 0.2s' }}
@@ -152,9 +211,9 @@ function HistoryList({ history, t }) {
 
 function EmptyState({ icon, msg }) {
     return (
-        <div className="glass-panel" style={{ textAlign: 'center', padding: '5rem 1rem', borderRadius: 'var(--radius-xl)' }}>
-            <div style={{ color: 'var(--color-neutral-600)', marginBottom: '1rem', display: 'flex', justifyContent: 'center' }}>{icon}</div>
-            <p style={{ color: 'var(--color-neutral-400)', fontSize: '1.05rem', fontWeight: 500 }}>{msg}</p>
-        </div>
+        <GlassPanel padding="7rem 2rem" borderRadius="var(--radius-xl)" style={{ textAlign: 'center', border: '1px dashed rgba(255,255,255,0.05)' }}>
+            <div style={{ color: 'var(--color-neutral-600)', marginBottom: '1.5rem', display: 'flex', justifyContent: 'center' }}>{icon}</div>
+            <p style={{ color: 'var(--color-neutral-400)', fontSize: '1.1rem', fontWeight: 500, maxWidth: '400px', margin: '0 auto' }}>{msg}</p>
+        </GlassPanel>
     );
 }

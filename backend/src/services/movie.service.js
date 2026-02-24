@@ -8,7 +8,7 @@ const omdbService = require('./omdb.service');
  * Get paginated movies with filters from DB.
  * Falls back to OMDb search if query is provided and few results in DB.
  */
-const getMovies = async ({ search, genre, minRating, sort, page, limit }) => {
+const getMovies = async ({ search, genre, minRating, sort, page, limit, autoImport = true }) => {
     const pageNum = parseInt(page) || 1;
     const limitNum = Math.min(parseInt(limit) || 20, 100);
     const skip = (pageNum - 1) * limitNum;
@@ -36,7 +36,7 @@ const getMovies = async ({ search, genre, minRating, sort, page, limit }) => {
     else if (sort === 'title') sortObj = { title: 1 };
 
     // If search and no local results, fetch from OMDb
-    if (search) {
+    if (search && autoImport) {
         const localCount = await Movie.countDocuments(query);
         if (localCount === 0) {
             await omdbService.searchMovies(search, 1);

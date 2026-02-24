@@ -10,6 +10,9 @@ import { moviesApi, userApi } from '../lib/api';
 import { useAuthStore } from '../store/auth.store';
 import { Film } from 'lucide-react';
 
+// UI Components
+import Button from '../components/ui/Button';
+
 export default function CataloguePage() {
     const { t } = useTranslation();
     const { isAuthenticated } = useAuthStore();
@@ -107,44 +110,40 @@ export default function CataloguePage() {
 
                 {/* Right Content (Movie Grid) */}
                 <section style={{ flex: '1', minWidth: 0 }}>
-                    {/* Header */}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                        <h2 style={{ fontSize: '1.5rem', fontWeight: 700, margin: 0 }}>
-                            {search ? `${t('catalog.search_results', 'Search Results')} (${total})` : t('catalog.new_releases', 'New Releases')}
-                        </h2>
+                    {/* Results Header */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2.5rem', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '1.5rem' }}>
+                        <div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
+                                <div style={{ width: '20px', height: '2px', backgroundColor: 'var(--color-accent)' }} />
+                                <span style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--color-accent)', letterSpacing: '0.15em', textTransform: 'uppercase' }}>
+                                    {t('catalog.discover', 'DISCOVER')}
+                                </span>
+                            </div>
+                            <h2 style={{ fontSize: '2rem', fontWeight: 900, margin: 0, letterSpacing: '-0.02em' }}>
+                                {search ? `${t('catalog.search_results', 'Résultats')} (${total})` : t('catalog.new_releases', 'Nouveautés')}
+                            </h2>
+                        </div>
 
                         {/* Tiny layout toggle buttons */}
                         <div style={{ display: 'flex', gap: '0.5rem' }}>
-                            <button
+                            <Button
+                                variant={viewMode === 'grid' ? 'primary' : 'outline'}
+                                size="sm"
+                                padding="0.5rem"
                                 onClick={() => setViewMode('grid')}
-                                style={{
-                                    width: '32px', height: '32px',
-                                    background: viewMode === 'grid' ? 'var(--color-bg-card)' : 'transparent',
-                                    border: '1px solid var(--color-neutral-800)',
-                                    borderRadius: '4px',
-                                    color: viewMode === 'grid' ? 'white' : 'var(--color-neutral-400)',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    cursor: 'pointer'
-                                }}
+                                style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                             >
-                                {/* Grid icon */}
                                 <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><rect width="6" height="6" /><rect width="6" height="6" x="8" /><rect width="6" height="6" y="8" /><rect width="6" height="6" x="8" y="8" /></svg>
-                            </button>
-                            <button
+                            </Button>
+                            <Button
+                                variant={viewMode === 'list' ? 'primary' : 'outline'}
+                                size="sm"
+                                padding="0.5rem"
                                 onClick={() => setViewMode('list')}
-                                style={{
-                                    width: '32px', height: '32px',
-                                    background: viewMode === 'list' ? 'var(--color-bg-card)' : 'transparent',
-                                    border: '1px solid var(--color-neutral-800)',
-                                    borderRadius: '4px',
-                                    color: viewMode === 'list' ? 'white' : 'var(--color-neutral-400)',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    cursor: 'pointer'
-                                }}
+                                style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                             >
-                                {/* List icon */}
                                 <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><rect width="14" height="4" /><rect width="14" height="4" y="5" /><rect width="14" height="4" y="10" /></svg>
-                            </button>
+                            </Button>
                         </div>
                     </div>
 
@@ -190,26 +189,46 @@ export default function CataloguePage() {
                             {/* Pagination */}
                             {pages > 1 && (
                                 <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginTop: '2rem' }}>
-                                    {/* Simplistic CineView pagination */}
-                                    <button disabled={page === 1} onClick={() => setPage(page - 1)} style={{ width: '36px', height: '36px', background: 'var(--color-bg-card)', border: '1px solid var(--color-neutral-800)', borderRadius: '4px', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: page === 1 ? 'default' : 'pointer', opacity: page === 1 ? 0.5 : 1 }}>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        disabled={page === 1}
+                                        onClick={() => setPage(page - 1)}
+                                        style={{ width: '36px', height: '36px' }}
+                                    >
                                         &lt;
-                                    </button>
+                                    </Button>
 
-                                    <button style={{ width: '36px', height: '36px', background: 'var(--color-accent)', border: 'none', borderRadius: '4px', color: 'white', fontWeight: 700 }}>
+                                    <Button
+                                        variant="primary"
+                                        size="sm"
+                                        style={{ width: '36px', height: '36px', fontWeight: 700 }}
+                                    >
                                         {page}
-                                    </button>
+                                    </Button>
 
                                     {page < pages && (
-                                        <button onClick={() => setPage(page + 1)} style={{ width: '36px', height: '36px', background: 'var(--color-bg-card)', border: '1px solid var(--color-neutral-800)', borderRadius: '4px', color: 'white', cursor: 'pointer' }}>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => setPage(page + 1)}
+                                            style={{ width: '36px', height: '36px' }}
+                                        >
                                             {page + 1}
-                                        </button>
+                                        </Button>
                                     )}
 
                                     <div style={{ color: 'var(--color-neutral-400)', alignSelf: 'center', padding: '0 0.5rem' }}>...</div>
 
-                                    <button disabled={page === pages} onClick={() => setPage(page + 1)} style={{ width: '36px', height: '36px', background: 'var(--color-bg-card)', border: '1px solid var(--color-neutral-800)', borderRadius: '4px', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: page === pages ? 'default' : 'pointer', opacity: page === pages ? 0.5 : 1 }}>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        disabled={page === pages}
+                                        onClick={() => setPage(page + 1)}
+                                        style={{ width: '36px', height: '36px' }}
+                                    >
                                         &gt;
-                                    </button>
+                                    </Button>
                                 </div>
                             )}
                         </>

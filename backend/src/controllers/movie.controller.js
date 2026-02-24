@@ -5,7 +5,9 @@ const path = require('path');
 const getMovies = async (req, res) => {
     try {
         const { search, genre, minRating, sort, page, limit } = req.query;
-        const result = await movieService.getMovies({ search, genre, minRating, sort, page, limit });
+        // Don't auto-import from OMDb if Admin is searching (they manage their own collection)
+        const autoImport = req.user?.role !== 'ADMIN';
+        const result = await movieService.getMovies({ search, genre, minRating, sort, page, limit, autoImport });
         res.json(result);
     } catch (error) {
         res.status(error.statusCode || 500).json({ message: error.message });
