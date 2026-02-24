@@ -12,6 +12,15 @@ const translateText = async (text, targetLang = 'fr') => {
     }
 };
 
+/**
+ * Replace OMDb default resolution suffix with a higher one.
+ * Example: _SX300.jpg -> _SX1000.jpg
+ */
+const upgradePosterUrl = (url) => {
+    if (!url || url === 'N/A') return url;
+    return url.replace(/_SX\d+\.jpg$/i, '_SX1000.jpg');
+};
+
 const OMDB_BASE_URL = 'http://www.omdbapi.com/';
 // Cache duration: 24 hours
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
@@ -91,7 +100,7 @@ const getMovieById = async (query) => {
         categories: genres,
         plot: plot,
         plotVO: originalPlot,
-        poster: data.Poster !== 'N/A' ? data.Poster : '',
+        poster: data.Poster !== 'N/A' ? upgradePosterUrl(data.Poster) : '',
         director: data.Director,
         actors: data.Actors,
         runtime: data.Runtime,
@@ -152,7 +161,7 @@ const searchMovies = async (query, page = 1) => {
                 imdbId: item.imdbID,
                 title: title,
                 year: item.Year,
-                poster: item.Poster !== 'N/A' ? item.Poster : '',
+                poster: item.Poster !== 'N/A' ? upgradePosterUrl(item.Poster) : '',
                 cachedAt: new Date(),
             });
             return newMovie;
@@ -186,7 +195,7 @@ const getSuggestions = async (query) => {
         imdbId: item.imdbID,
         title: item.Title,
         year: item.Year,
-        poster: item.Poster !== 'N/A' ? item.Poster : null
+        poster: item.Poster !== 'N/A' ? upgradePosterUrl(item.Poster) : null
     }));
 };
 
