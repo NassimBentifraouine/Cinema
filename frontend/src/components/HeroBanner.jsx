@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { moviesApi } from '../lib/api';
 
 export default function HeroBanner() {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const [featured, setFeatured] = useState(null);
     const [idx, setIdx] = useState(0);
     const [films, setFilms] = useState([]);
@@ -35,8 +35,12 @@ export default function HeroBanner() {
         ? `http://localhost:3001${featured.customPoster}`
         : featured.poster;
 
+    const isEn = i18n.language === 'en';
+    const displayTitle = (isEn && featured.titleVO) ? featured.titleVO : featured.title;
+    const displayPlot = (isEn && featured.plotVO) ? featured.plotVO : featured.plot;
+
     // Formatting title for the mockup look (first word bold italic white, rest bold italic red)
-    const titleWords = featured.title ? featured.title.split(' ') : ['THE', 'MOVIE'];
+    const titleWords = displayTitle ? displayTitle.split(' ') : ['THE', 'MOVIE'];
     const firstWord = titleWords[0];
     const restOfTitle = titleWords.slice(1).join(' ');
 
@@ -47,13 +51,13 @@ export default function HeroBanner() {
                 minHeight: '600px', backgroundColor: 'var(--color-bg-dark)',
                 overflow: 'hidden'
             }}
-            aria-label={`Film en vedette: ${featured.title}`}
+            aria-label={`Film en vedette: ${displayTitle}`}
         >
             {/* Full Bleed Background image */}
             <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}>
                 <img
                     src={posterSrc}
-                    alt={featured.title}
+                    alt={displayTitle}
                     style={{
                         width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 20%',
                         transition: 'opacity 1s ease-in-out',
@@ -114,13 +118,13 @@ export default function HeroBanner() {
                         <span style={{ color: 'var(--color-accent)' }}>{restOfTitle || 'MOVIE'}</span>
                     </h1>
 
-                    {featured.plot && (
+                    {displayPlot && (
                         <p className="line-clamp-3" style={{
                             color: 'var(--color-neutral-200)', lineHeight: 1.6,
                             fontSize: '1.1rem', marginBottom: '2.5rem', fontWeight: 400,
                             maxWidth: '500px'
                         }}>
-                            {featured.plot}
+                            {displayPlot}
                         </p>
                     )}
 
