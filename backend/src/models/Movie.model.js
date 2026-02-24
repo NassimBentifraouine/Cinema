@@ -12,6 +12,10 @@ const movieSchema = new mongoose.Schema({
         required: true,
         trim: true,
     },
+    titleVO: {
+        type: String,
+        default: '',
+    },
     year: {
         type: String,
         default: '',
@@ -20,7 +24,15 @@ const movieSchema = new mongoose.Schema({
         type: [String],
         default: [],
     },
+    genreVO: {
+        type: [String],
+        default: [],
+    },
     plot: {
+        type: String,
+        default: '',
+    },
+    plotVO: {
         type: String,
         default: '',
     },
@@ -68,6 +80,6 @@ const movieSchema = new mongoose.Schema({
 });
 
 // Text index for search
-movieSchema.index({ title: 'text', plot: 'text' });
+movieSchema.index({ title: 'text', plot: 'text' }, { language_override: 'dummyLanguage' });
 
 module.exports = mongoose.model('Movie', movieSchema);

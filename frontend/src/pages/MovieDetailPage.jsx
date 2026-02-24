@@ -1,23 +1,25 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Star, Clock, Globe, ChevronLeft, User } from 'lucide-react';
+import { Star, Clock, Calendar, Heart, User } from 'lucide-react';
 import { moviesApi, userApi } from '../lib/api';
-import FavoriteButton from '../components/FavoriteButton';
-import StarRating from '../components/StarRating';
 import CommentSection from '../components/CommentSection';
+import StarRating from '../components/StarRating';
 import { useAuthStore } from '../store/auth.store';
 import { useToast } from '../components/ui/Toaster';
 
-const PLACEHOLDER_POSTER = 'https://via.placeholder.com/400x600/100f1e/8888aa?text=No+Poster';
+const PLACEHOLDER_POSTER = 'https://via.placeholder.com/400x600/141414/8888aa?text=No+Poster';
+const AVATAR_PLACEHOLDER = 'https://api.dicebear.com/7.x/notionists/svg?seed=';
 
 export default function MovieDetailPage() {
     const { id } = useParams();
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const { isAuthenticated } = useAuthStore();
     const { toast } = useToast();
     const [movie, setMovie] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [isFavorite, setIsFavorite] = useState(false);
+    const [savingFav, setSavingFav] = useState(false);
     const [userRating, setUserRating] = useState(0);
     const [ratingLoading, setRatingLoading] = useState(false);
 
@@ -31,35 +33,33 @@ export default function MovieDetailPage() {
 
     useEffect(() => {
         if (!isAuthenticated) return;
+        userApi.getFavorites().then(r => {
+            const isFav = r.data.favorites?.some(f => (f._id || f) === id);
+            setIsFavorite(!!isFav);
+        }).catch(() => { });
+
         userApi.getRatings().then(r => {
             const found = r.data.ratings?.find(rt => rt.movie?._id === movie?._id);
             if (found) setUserRating(found.score);
         }).catch(() => { });
-    }, [isAuthenticated, movie]);
 
-    // Track history — called once movie is loaded and user is authenticated
-    useEffect(() => {
-        if (!isAuthenticated || !movie?._id) return;
-        userApi.addHistory(movie._id).catch(() => { });
-    }, [isAuthenticated, movie?._id]);
-
-    const refreshMovie = () => {
-        moviesApi.getOne(id).then(r => setMovie(r.data)).catch(() => { });
-    };
+        // Add to history
+        if (movie?._id) userApi.addHistory(movie._id).catch(() => { });
+    }, [isAuthenticated, id, movie?._id]);
 
     const handleRate = async (score) => {
         if (!isAuthenticated) {
-            toast({ message: 'Connectez-vous pour noter ce film', type: 'info' });
+            toast({ message: t('movie.login_to_rate'), type: 'info' });
             return;
         }
         setRatingLoading(true);
         try {
             await userApi.rateMovie(movie._id, score);
             setUserRating(score);
-            refreshMovie(); // Update community stats
-            toast({ message: `Note de ${score}/10 enregistrée !`, type: 'success' });
-        } catch {
-            toast({ message: t('errors.server_error'), type: 'error' });
+            moviesApi.getOne(id).then(r => setMovie(r.data)).catch(() => { }); // Refresh stats
+            toast({ message: `${score}/10!`, type: 'success' });
+        } catch (err) {
+            toast({ message: err.response?.data?.message || t('errors.server_error'), type: 'error' });
         } finally {
             setRatingLoading(false);
         }
@@ -70,21 +70,44 @@ export default function MovieDetailPage() {
         try {
             await userApi.deleteRating(movie._id);
             setUserRating(0);
-            refreshMovie(); // Update community stats
-            toast({ message: 'Note supprimée', type: 'info' });
-        } catch {
-            toast({ message: t('errors.server_error'), type: 'error' });
+            moviesApi.getOne(id).then(r => setMovie(r.data)).catch(() => { }); // Refresh stats
+            toast({ message: t('movie.remove_rating'), type: 'info' });
+        } catch (err) {
+            toast({ message: err.response?.data?.message || t('errors.server_error'), type: 'error' });
         } finally {
             setRatingLoading(false);
+        }
+    };
+
+    const handleToggleFavorite = async () => {
+        if (!isAuthenticated) {
+            toast({ message: t('movie.login_to_favorite'), type: 'info' });
+            return;
+        }
+        setSavingFav(true);
+        try {
+            if (isFavorite) {
+                await userApi.removeFavorite(id);
+                setIsFavorite(false);
+                toast({ message: t('movie.removed_favorite'), type: 'info' });
+            } else {
+                await userApi.addFavorite(id);
+                setIsFavorite(true);
+                toast({ message: t('movie.added_favorite'), type: 'success' });
+            }
+        } catch (err) {
+            toast({ message: err.response?.data?.message || t('errors.server_error'), type: 'error' });
+        } finally {
+            setSavingFav(false);
         }
     };
 
     if (loading) return <MovieDetailSkeleton />;
     if (!movie) return (
         <div style={{ textAlign: 'center', padding: '6rem 1rem' }}>
-            <p style={{ color: 'var(--color-neutral-400)', fontSize: '1.2rem' }}>Film non trouvé.</p>
+            <p style={{ color: 'var(--color-neutral-400)', fontSize: '1.2rem' }}>{t('catalog.no_results')}</p>
             <Link to="/" style={{ color: 'var(--color-accent)', marginTop: '1rem', display: 'inline-block' }}>
-                ← Retour au catalogue
+                ← {t('common.back')}
             </Link>
         </div>
     );
@@ -93,150 +116,286 @@ export default function MovieDetailPage() {
         ? `http://localhost:3001${movie.customPoster}`
         : movie.poster || PLACEHOLDER_POSTER;
 
+    // Fake related movies since backend doesn't provide them, using same poster
+    const relatedFake = [1, 2, 3];
+    // Fake Cast
+    const fakeCast = [
+        { name: 'Matthew McConaughey', role: 'Cooper' },
+        { name: 'Anne Hathaway', role: 'Brand' },
+        { name: 'Jessica Chastain', role: 'Murph' },
+        { name: 'Michael Caine', role: 'Professor Brand' },
+        { name: 'Casey Affleck', role: 'Tom' }
+    ];
+
+    const isEn = i18n.language === 'en';
+    const displayTitle = (isEn && movie.titleVO) ? movie.titleVO : movie.title;
+    const displayPlot = (isEn && movie.plotVO) ? movie.plotVO : movie.plot;
+    const displayGenre = (isEn && movie.genreVO?.length > 0) ? movie.genreVO : movie.genre;
+    const displayLanguage = movie.language;
+
     return (
-        <main style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem 1.5rem' }} className="animate-fade-in">
-            {/* Back link */}
-            <Link
-                to="/"
-                style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', color: 'var(--color-neutral-400)', fontSize: '0.875rem', marginBottom: '1.5rem', transition: 'color 0.2s' }}
-                onMouseEnter={e => e.currentTarget.style.color = 'var(--color-neutral-100)'}
-                onMouseLeave={e => e.currentTarget.style.color = 'var(--color-neutral-400)'}
-            >
-                <ChevronLeft size={16} /> {t('common.back')}
-            </Link>
+        <main className="animate-fade-in-slow" style={{ minHeight: '100vh', paddingBottom: '4rem' }}>
+            {/* Top Background Hero Section */}
+            <div style={{ position: 'relative', width: '100%', height: '80vh', minHeight: '600px', overflow: 'hidden' }}>
+                <div
+                    style={{
+                        position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+                        backgroundImage: `url(${posterSrc})`,
+                        backgroundSize: 'cover', backgroundPosition: 'center 20%',
+                        filter: 'blur(20px) scale(1.1)',
+                        opacity: 0.3,
+                        transform: 'translateZ(0)'
+                    }}
+                />
+                <div
+                    style={{
+                        position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+                        background: 'linear-gradient(to bottom, var(--color-bg-dark) 0%, transparent 50%, var(--color-bg-dark) 100%), linear-gradient(to right, var(--color-bg-dark) 0%, transparent 100%)',
+                    }}
+                />
+            </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(250px, 320px) 1fr', gap: '2.5rem', alignItems: 'start' }}>
-                {/* Poster */}
-                <div style={{ position: 'sticky', top: '80px' }}>
-                    <img
-                        src={posterSrc}
-                        alt={movie.title}
-                        style={{ width: '100%', borderRadius: 'var(--radius-xl)', boxShadow: '0 30px 80px rgba(0,0,0,0.6)', display: 'block' }}
-                        onError={e => { e.target.src = PLACEHOLDER_POSTER; }}
-                    />
-                </div>
+            {/* Main Content overlapping the hero */}
+            <div style={{ maxWidth: '1400px', margin: '-50vh auto 0', padding: '0 4%', position: 'relative', zIndex: 10 }}>
 
-                {/* Details */}
-                <div>
-                    {/* Genres */}
-                    <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', marginBottom: '0.75rem' }}>
-                        {(movie.genre || []).map(g => (
-                            <span key={g} style={{
-                                padding: '0.2rem 0.65rem', fontSize: '0.75rem', fontWeight: 600,
-                                borderRadius: 'var(--radius-pill)', background: 'var(--color-neutral-900)',
-                                color: 'var(--color-neutral-200)', border: '1px solid var(--color-neutral-700)',
-                            }}>{g}</span>
-                        ))}
-                    </div>
+                {/* Top Section Layout: Poster on left, Info on right */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'minmax(300px, 350px) 1fr', gap: '5rem', alignItems: 'end', marginBottom: '5rem' }}>
 
-                    <h1 style={{ margin: '0 0 0.5rem', fontSize: 'clamp(1.75rem, 4vw, 2.75rem)', fontWeight: 800, lineHeight: 1.15 }}>
-                        {movie.title}
-                    </h1>
-
-                    {/* Meta */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', flexWrap: 'wrap', marginBottom: '1.5rem' }}>
-                        {movie.year && <MetaItem icon={null} label={movie.year} />}
-                        {movie.runtime && <MetaItem icon={<Clock size={14} />} label={movie.runtime} />}
-                        {movie.language && <MetaItem icon={<Globe size={14} />} label={movie.language} />}
-
-                        {/* Community Rating */}
-                        {movie.communityVotes > 0 && (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.3rem 0.75rem', background: 'rgba(var(--color-accent-rgb), 0.1)', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-accent)', color: 'var(--color-accent)' }}>
-                                <User size={14} fill="currentColor" />
-                                <span style={{ fontWeight: 700, fontSize: '1rem' }}>{movie.communityRating.toFixed(1)}</span>
-                                <span style={{ fontSize: '0.75rem', opacity: 0.8 }}>({movie.communityVotes} {movie.communityVotes > 1 ? 'avis' : 'avis'})</span>
-                            </div>
-                        )}
-
-                        {movie.imdbRating > 0 && (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.3rem 0.75rem', background: 'var(--color-neutral-900)', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-neutral-700)' }}>
-                                <Star size={16} fill="var(--color-gold)" color="var(--color-gold)" />
-                                <span style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--color-gold)' }}>{movie.imdbRating.toFixed(1)}</span>
-                                <span style={{ fontSize: '0.75rem', color: 'var(--color-neutral-400)' }}>/10 IMDb</span>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Plot */}
-                    {movie.plot && (
-                        <div style={{ marginBottom: '1.75rem' }}>
-                            <h2 style={{ fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--color-neutral-400)', marginBottom: '0.5rem' }}>
-                                {t('movie.plot')}
-                            </h2>
-                            <p style={{ color: 'var(--color-neutral-200)', lineHeight: 1.7, margin: 0 }}>{movie.plot}</p>
+                    {/* Left: Premium Framed Poster */}
+                    <div style={{ position: 'relative', transition: 'transform 0.5s ease' }}>
+                        <div style={{
+                            background: '#fff',
+                            padding: '12px',
+                            borderRadius: '2px',
+                            boxShadow: '0 30px 60px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.1)',
+                            position: 'relative',
+                            zIndex: 10,
+                            transform: 'rotate(-1deg)'
+                        }}>
+                            <img
+                                src={posterSrc}
+                                alt={movie.title}
+                                style={{
+                                    width: '100%', display: 'block',
+                                    aspectRatio: '2/3', objectFit: 'cover'
+                                }}
+                            />
                         </div>
-                    )}
-
-                    {/* Director / Actors */}
-                    {movie.director && <InfoRow label={t('movie.director')} value={movie.director} />}
-                    {movie.actors && <InfoRow label={t('movie.actors')} value={movie.actors} />}
-
-                    {/* Actions */}
-                    <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', margin: '2rem 0', alignItems: 'center' }}>
-                        <FavoriteButton movieId={movie._id} size="lg" />
                     </div>
 
-                    {/* User rating */}
-                    <div style={{ padding: '1.25rem', background: 'var(--color-bg-card)', borderRadius: 'var(--radius-xl)', border: '1px solid var(--color-neutral-800)' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-                            <h3 style={{ margin: 0, fontSize: '0.9rem', fontWeight: 700 }}>{t('movie.rate_movie')}</h3>
-                            {userRating > 0 && (
-                                <button
-                                    onClick={handleDeleteRating}
-                                    disabled={ratingLoading}
-                                    style={{
-                                        background: 'transparent', border: 'none', color: '#ff4d4d',
-                                        fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer',
-                                        padding: '0.2rem 0.5rem', borderRadius: 'var(--radius-sm)',
-                                        transition: 'background 0.2s',
-                                    }}
-                                    onMouseEnter={e => e.currentTarget.style.background = 'rgba(255, 77, 77, 0.1)'}
-                                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-                                >
-                                    Supprimer ma note
-                                </button>
+                    {/* Right: Info Area */}
+                    <div style={{ paddingBottom: '2rem' }}>
+
+                        {/* Breadcrumbs-ish / Meta */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem', flexWrap: 'wrap', marginBottom: '2rem', fontWeight: 700, fontSize: '0.85rem', letterSpacing: '0.05em' }}>
+                            <div style={{
+                                backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                                backdropFilter: 'blur(10px)',
+                                color: 'var(--color-accent)',
+                                padding: '0.4rem 0.8rem',
+                                borderRadius: '4px',
+                                border: '1px solid rgba(255, 255, 255, 0.1)',
+                                textTransform: 'uppercase'
+                            }}>
+                                {displayGenre?.length > 0 ? displayGenre.join(' / ') : 'MOVIE'}
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-neutral-300)' }}>
+                                <Calendar size={16} color="var(--color-accent)" />
+                                {movie.year || 'N/A'}
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-neutral-300)' }}>
+                                <Clock size={16} color="var(--color-accent)" />
+                                {movie.runtime || '2h 0m'}
+                            </div>
+                        </div>
+
+                        {/* Cinematic Title */}
+                        <h1 style={{
+                            margin: '0 0 2.5rem',
+                            fontSize: 'clamp(3.5rem, 8vw, 5.5rem)',
+                            fontWeight: 900,
+                            lineHeight: 0.9,
+                            letterSpacing: '-0.04em',
+                            color: 'white',
+                            textTransform: 'uppercase',
+                            fontStyle: 'italic'
+                        }}>
+                            {displayTitle}
+                        </h1>
+
+                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '4rem', flexWrap: 'wrap' }}>
+                            {/* Dual Rating Block */}
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                                {/* IMDb Rating */}
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+                                    <div style={{
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        backgroundColor: '#f5c518',
+                                        color: '#000',
+                                        padding: '2px 6px',
+                                        borderRadius: '4px',
+                                        fontSize: '0.75rem',
+                                        fontWeight: 900,
+                                        width: 'fit-content'
+                                    }}>
+                                        IMDb
+                                    </div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+                                        <div style={{ display: 'flex', color: '#f5c518' }}>
+                                            {[1, 2, 3, 4, 5].map(s => (
+                                                <Star key={s} size={20} fill={s <= (movie.imdbRating / 2) ? 'currentColor' : 'none'} color={s <= (movie.imdbRating / 2) ? 'currentColor' : 'var(--color-neutral-800)'} />
+                                            ))}
+                                        </div>
+                                        <div style={{ color: 'white', fontWeight: 900, fontSize: '1.5rem', display: 'flex', alignItems: 'baseline', gap: '2px' }}>
+                                            {movie.imdbRating?.toFixed(1) || '0.0'}<span style={{ fontSize: '0.9rem', color: 'var(--color-neutral-500)', fontWeight: 600 }}>/10</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Community Rating */}
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+                                    <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--color-neutral-400)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>{t('movie.community_score', 'UTILISATEURS')}</span>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+                                        <div style={{ display: 'flex', color: 'var(--color-accent)' }}>
+                                            {[1, 2, 3, 4, 5].map(s => (
+                                                <Star key={s} size={20} fill={s <= (movie.communityRating / 2) ? 'currentColor' : 'none'} color={s <= (movie.communityRating / 2) ? 'currentColor' : 'var(--color-neutral-800)'} />
+                                            ))}
+                                        </div>
+                                        <div style={{ color: 'white', fontWeight: 900, fontSize: '1.5rem', display: 'flex', alignItems: 'baseline', gap: '2px' }}>
+                                            {movie.communityRating?.toFixed(1) || '0.0'}<span style={{ fontSize: '0.9rem', color: 'var(--color-neutral-500)', fontWeight: 600 }}>/10</span>
+                                        </div>
+                                        {movie.communityVotes > 0 && (
+                                            <span style={{ fontSize: '0.85rem', color: 'var(--color-accent)', fontWeight: 700, padding: '2px 8px', borderRadius: '100px', backgroundColor: 'rgba(229, 9, 20, 0.1)' }}>
+                                                {movie.communityVotes} {movie.communityVotes > 1 ? 'votes' : 'vote'}
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Actions Column */}
+                            {isAuthenticated && (
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', minWidth: '350px' }}>
+                                    <button
+                                        onClick={handleToggleFavorite}
+                                        disabled={savingFav}
+                                        style={{
+                                            padding: '1.2rem 2.5rem',
+                                            fontSize: '1rem',
+                                            fontWeight: 800,
+                                            letterSpacing: '0.05em',
+                                            textTransform: 'uppercase',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            gap: '0.8rem',
+                                            backgroundColor: isFavorite ? 'transparent' : 'var(--color-accent)',
+                                            color: 'white',
+                                            border: isFavorite ? '2px solid rgba(255,255,255,0.2)' : 'none',
+                                            borderRadius: '4px',
+                                            cursor: 'pointer',
+                                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                            boxShadow: isFavorite ? 'none' : '0 10px 20px rgba(229, 9, 20, 0.3)'
+                                        }}
+                                        onMouseEnter={e => {
+                                            if (!isFavorite) e.currentTarget.style.transform = 'translateY(-2px)';
+                                            else e.currentTarget.style.borderColor = 'rgba(255,255,255,0.5)';
+                                        }}
+                                        onMouseLeave={e => {
+                                            if (!isFavorite) e.currentTarget.style.transform = 'translateY(0)';
+                                            else e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)';
+                                        }}
+                                    >
+                                        {isFavorite ? <Heart size={22} fill="white" /> : <Heart size={22} />}
+                                        {isFavorite ? t('movie.in_watchlist') : t('movie.add_to_watchlist')}
+                                    </button>
+
+                                    {/* Mini Rating Module */}
+                                    <div style={{
+                                        border: '1px solid rgba(255,255,255,0.05)',
+                                        padding: '1.5rem', borderRadius: '8px',
+                                        backgroundColor: 'rgba(255,255,255,0.02)',
+                                        backdropFilter: 'blur(5px)',
+                                        display: 'flex', flexDirection: 'column', gap: '1rem'
+                                    }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                            <h3 style={{ margin: 0, fontSize: '0.8rem', fontWeight: 800, textTransform: 'uppercase', color: 'var(--color-neutral-400)', letterSpacing: '0.1em' }}>{t('movie.rate_movie')}</h3>
+                                            {userRating > 0 && (
+                                                <button
+                                                    onClick={handleDeleteRating}
+                                                    disabled={ratingLoading}
+                                                    style={{
+                                                        background: 'transparent', color: 'var(--color-neutral-500)',
+                                                        fontSize: '0.7rem', fontWeight: 700, cursor: 'pointer',
+                                                        border: 'none', textDecoration: 'underline'
+                                                    }}
+                                                >
+                                                    {t('movie.remove_rating')}
+                                                </button>
+                                            )}
+                                        </div>
+                                        <StarRating value={userRating} onChange={ratingLoading ? undefined : handleRate} max={10} size={24} />
+                                    </div>
+                                </div>
                             )}
                         </div>
-                        <StarRating value={userRating} onChange={ratingLoading ? undefined : handleRate} max={10} size={22} />
-                        {!isAuthenticated && <p style={{ margin: '0.5rem 0 0', fontSize: '0.8rem', color: 'var(--color-neutral-400)' }}>Connectez-vous pour noter ce film.</p>}
+                    </div>
+                </div>
+
+                {/* Bottom Content Section */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.6fr) minmax(0, 1fr)', gap: '6rem' }}>
+
+                    {/* Left: Plot & Info */}
+                    <div style={{ maxWidth: '800px' }}>
+                        <div style={{ marginBottom: '4rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.8rem' }}>
+                                <div style={{ width: '40px', height: '2px', backgroundColor: 'var(--color-accent)' }} />
+                                <h2 style={{ fontSize: '1.2rem', fontWeight: 900, margin: 0, textTransform: 'uppercase', letterSpacing: '0.1em' }}>{t('movie.plot')}</h2>
+                            </div>
+                            <p style={{
+                                color: 'var(--color-neutral-200)',
+                                lineHeight: 1.8,
+                                fontSize: '1.15rem',
+                                margin: 0,
+                                fontWeight: 400
+                            }}>
+                                {displayPlot || t('catalog.no_results')}
+                            </p>
+                        </div>
+
+                        <CommentSection movieId={movie._id} />
+                    </div>
+
+                    {/* Right: Technical or Additional info could go here, for now empty or refined sidebar */}
+                    <div style={{ padding: '2rem', borderLeft: '1px solid rgba(255,255,255,0.05)' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                            <div>
+                                <h4 style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--color-neutral-500)', textTransform: 'uppercase', marginBottom: '0.8rem', letterSpacing: '0.1em' }}>{t('movie.details')}</h4>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', fontSize: '0.9rem' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: 'var(--color-neutral-400)' }}>Status</span> <span style={{ color: 'white', fontWeight: 600 }}>Released</span></div>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: 'var(--color-neutral-400)' }}>Type</span> <span style={{ color: 'white', fontWeight: 600 }}>Feature Film</span></div>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: 'var(--color-neutral-400)' }}>Language</span> <span style={{ color: 'white', fontWeight: 600 }}>{displayLanguage || 'English'}</span></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-
-            {/* Comment Section below */}
-            <CommentSection movieId={movie._id} />
         </main>
-    );
-}
-
-function MetaItem({ icon, label }) {
-    return (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', color: 'var(--color-neutral-400)', fontSize: '0.875rem' }}>
-            {icon}
-            {label}
-        </div>
-    );
-}
-
-function InfoRow({ label, value }) {
-    return (
-        <div style={{ marginBottom: '0.75rem' }}>
-            <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--color-neutral-400)', marginRight: '0.5rem' }}>{label}:</span>
-            <span style={{ color: 'var(--color-neutral-200)', fontSize: '0.9rem' }}>{value}</span>
-        </div>
     );
 }
 
 function MovieDetailSkeleton() {
     return (
-        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem 1.5rem' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(250px, 320px) 1fr', gap: '2.5rem' }}>
-                <div className="skeleton" style={{ aspectRatio: '2/3', borderRadius: 'var(--radius-xl)' }} />
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    <div className="skeleton" style={{ height: '2.5rem', width: '60%', borderRadius: 'var(--radius-md)' }} />
-                    <div className="skeleton" style={{ height: '1rem', width: '40%', borderRadius: 'var(--radius-md)' }} />
-                    <div className="skeleton" style={{ height: '6rem', borderRadius: 'var(--radius-lg)' }} />
-                    <div className="skeleton" style={{ height: '3rem', width: '200px', borderRadius: 'var(--radius-pill)' }} />
+        <div style={{ minHeight: '100vh', padding: '6rem 4%' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(280px, 320px) 1fr', gap: '4rem' }}>
+                <div className="skeleton" style={{ aspectRatio: '2/3', borderRadius: '2px' }} />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', paddingTop: '2rem' }}>
+                    <div className="skeleton" style={{ height: '2rem', width: '40%' }} />
+                    <div className="skeleton" style={{ height: '4rem', width: '80%' }} />
+                    <div className="skeleton" style={{ height: '3rem', width: '50%' }} />
                 </div>
             </div>
         </div>

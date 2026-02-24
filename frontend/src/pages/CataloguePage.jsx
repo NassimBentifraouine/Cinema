@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import HeroBanner from '../components/HeroBanner';
@@ -9,7 +9,6 @@ import { useFiltersStore } from '../store/filters.store';
 import { moviesApi, userApi } from '../lib/api';
 import { useAuthStore } from '../store/auth.store';
 import { Film } from 'lucide-react';
-import { useState } from 'react';
 
 export default function CataloguePage() {
     const { t } = useTranslation();
@@ -19,6 +18,7 @@ export default function CataloguePage() {
     const [pages, setPages] = useState(1);
     const [loading, setLoading] = useState(false);
     const [favorites, setFavorites] = useState([]);
+    const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
     const [searchParams, setSearchParams] = useSearchParams();
 
     const { search, genre, minRating, sort, page, limit, setSearch, setGenre, setMinRating, setSort, setPage } = useFiltersStore();
@@ -81,68 +81,140 @@ export default function CataloguePage() {
     }, [favorites]);
 
     return (
-        <main>
+        <main style={{ paddingBottom: '4rem' }}>
             <HeroBanner />
 
-            <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '2rem 1.5rem' }}>
-                {/* Section header */}
-                <div style={{ marginBottom: '1.5rem' }}>
-                    <h2 style={{ margin: '0 0 0.25rem', fontSize: '1.5rem', fontWeight: 700 }}>
-                        {t('catalog.title')}
-                    </h2>
-                    {!loading && (
-                        <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--color-neutral-400)' }}>
-                            {total} film{total > 1 ? 's' : ''} trouvé{total > 1 ? 's' : ''}
-                        </p>
-                    )}
-                </div>
+            {/* Main Layout Container (Sidebar + Grid) */}
+            <div style={{
+                display: 'flex',
+                gap: '2rem',
+                padding: '2rem 4%',
+                maxWidth: '1800px',
+                margin: '0 auto',
+                alignItems: 'flex-start'
+            }}>
 
-                {/* Filters */}
-                <div style={{ marginBottom: '1.5rem' }}>
+                {/* Left Sidebar (Filters) */}
+                <aside style={{
+                    flex: '0 0 280px', /* Fixed width */
+                    position: 'sticky',
+                    top: '90px' /* Stick below navbar */
+                }}>
                     <FilterPanel />
-                </div>
 
-                {/* Loading skeleton grid */}
-                {loading && (
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: '1rem' }}>
-                        {Array.from({ length: 20 }).map((_, i) => (
-                            <div key={i} className="skeleton" style={{ aspectRatio: '2/3', borderRadius: 'var(--radius-lg)' }} />
-                        ))}
+
+                </aside>
+
+                {/* Right Content (Movie Grid) */}
+                <section style={{ flex: '1', minWidth: 0 }}>
+                    {/* Header */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                        <h2 style={{ fontSize: '1.5rem', fontWeight: 700, margin: 0 }}>
+                            {search ? `${t('catalog.search_results', 'Search Results')} (${total})` : t('catalog.new_releases', 'New Releases')}
+                        </h2>
+
+                        {/* Tiny layout toggle buttons */}
+                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                            <button
+                                onClick={() => setViewMode('grid')}
+                                style={{
+                                    width: '32px', height: '32px',
+                                    background: viewMode === 'grid' ? 'var(--color-bg-card)' : 'transparent',
+                                    border: '1px solid var(--color-neutral-800)',
+                                    borderRadius: '4px',
+                                    color: viewMode === 'grid' ? 'white' : 'var(--color-neutral-400)',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                {/* Grid icon */}
+                                <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><rect width="6" height="6" /><rect width="6" height="6" x="8" /><rect width="6" height="6" y="8" /><rect width="6" height="6" x="8" y="8" /></svg>
+                            </button>
+                            <button
+                                onClick={() => setViewMode('list')}
+                                style={{
+                                    width: '32px', height: '32px',
+                                    background: viewMode === 'list' ? 'var(--color-bg-card)' : 'transparent',
+                                    border: '1px solid var(--color-neutral-800)',
+                                    borderRadius: '4px',
+                                    color: viewMode === 'list' ? 'white' : 'var(--color-neutral-400)',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                {/* List icon */}
+                                <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><rect width="14" height="4" /><rect width="14" height="4" y="5" /><rect width="14" height="4" y="10" /></svg>
+                            </button>
+                        </div>
                     </div>
-                )}
 
-                {/* No results */}
-                {!loading && movies.length === 0 && (
-                    <div style={{ textAlign: 'center', padding: '5rem 1rem' }}>
-                        <Film size={48} style={{ color: 'var(--color-neutral-700)', marginBottom: '1rem' }} />
-                        <p style={{ color: 'var(--color-neutral-400)', fontSize: '1.1rem' }}>{t('catalog.no_results')}</p>
-                    </div>
-                )}
-
-                {/* Movie grid */}
-                {!loading && movies.length > 0 && (
-                    <>
-                        <div
-                            style={{
-                                display: 'grid',
-                                gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
-                                gap: '1rem',
-                                marginBottom: '2rem',
-                            }}
-                        >
-                            {movies.map(movie => (
-                                <MovieCard
-                                    key={movie._id}
-                                    movie={movie}
-                                    isFavorite={favorites.includes(movie._id)}
-                                    onToggleFavorite={isAuthenticated ? handleToggleFavorite : null}
-                                />
+                    {/* Grid */}
+                    {loading && (
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '1.5rem' }}>
+                            {Array.from({ length: 12 }).map((_, i) => (
+                                <div key={i} className="skeleton" style={{ aspectRatio: '2/3.5', borderRadius: 'var(--radius-sm)' }} />
                             ))}
                         </div>
+                    )}
 
-                        <Pagination page={page} pages={pages} onPageChange={setPage} />
-                    </>
-                )}
+                    {!loading && movies.length === 0 && (
+                        <div style={{ textAlign: 'center', padding: '5rem 1rem' }}>
+                            <Film size={48} style={{ color: 'var(--color-neutral-700)', marginBottom: '1rem', margin: '0 auto' }} />
+                            <p style={{ color: 'var(--color-neutral-400)', fontSize: '1.1rem' }}>{t('catalog.no_results')}</p>
+                        </div>
+                    )}
+
+                    {!loading && movies.length > 0 && (
+                        <>
+                            <div
+                                style={{
+                                    display: 'grid',
+                                    gridTemplateColumns: viewMode === 'grid'
+                                        ? 'repeat(auto-fill, minmax(220px, 1fr))'
+                                        : '1fr',
+                                    gap: '1.5rem',
+                                    marginBottom: '3rem',
+                                }}
+                            >
+                                {movies.map(movie => (
+                                    <MovieCard
+                                        key={movie._id}
+                                        movie={movie}
+                                        variant={viewMode}
+                                        isFavorite={favorites.includes(movie._id)}
+                                        onToggleFavorite={isAuthenticated ? handleToggleFavorite : null}
+                                    />
+                                ))}
+                            </div>
+
+                            {/* Pagination */}
+                            {pages > 1 && (
+                                <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginTop: '2rem' }}>
+                                    {/* Simplistic CineView pagination */}
+                                    <button disabled={page === 1} onClick={() => setPage(page - 1)} style={{ width: '36px', height: '36px', background: 'var(--color-bg-card)', border: '1px solid var(--color-neutral-800)', borderRadius: '4px', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: page === 1 ? 'default' : 'pointer', opacity: page === 1 ? 0.5 : 1 }}>
+                                        &lt;
+                                    </button>
+
+                                    <button style={{ width: '36px', height: '36px', background: 'var(--color-accent)', border: 'none', borderRadius: '4px', color: 'white', fontWeight: 700 }}>
+                                        {page}
+                                    </button>
+
+                                    {page < pages && (
+                                        <button onClick={() => setPage(page + 1)} style={{ width: '36px', height: '36px', background: 'var(--color-bg-card)', border: '1px solid var(--color-neutral-800)', borderRadius: '4px', color: 'white', cursor: 'pointer' }}>
+                                            {page + 1}
+                                        </button>
+                                    )}
+
+                                    <div style={{ color: 'var(--color-neutral-400)', alignSelf: 'center', padding: '0 0.5rem' }}>...</div>
+
+                                    <button disabled={page === pages} onClick={() => setPage(page + 1)} style={{ width: '36px', height: '36px', background: 'var(--color-bg-card)', border: '1px solid var(--color-neutral-800)', borderRadius: '4px', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: page === pages ? 'default' : 'pointer', opacity: page === pages ? 0.5 : 1 }}>
+                                        &gt;
+                                    </button>
+                                </div>
+                            )}
+                        </>
+                    )}
+                </section>
             </div>
         </main>
     );

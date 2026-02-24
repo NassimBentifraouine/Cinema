@@ -12,6 +12,8 @@ export default function AdminDashboard() {
     const [page, setPage] = useState(1);
     const [search, setSearch] = useState('');
     const [loading, setLoading] = useState(true);
+    const [importLoading, setImportLoading] = useState(false);
+    const [omdbImportId, setOmdbImportId] = useState('');
     const [modalOpen, setModalOpen] = useState(false);
     const [editMovie, setEditMovie] = useState(null);
     const [deleteId, setDeleteId] = useState(null);
@@ -23,6 +25,24 @@ export default function AdminDashboard() {
             .then(r => { setMovies(r.data.movies || []); setTotal(r.data.total || 0); })
             .catch(() => { })
             .finally(() => setLoading(false));
+    };
+
+    const handleQuickImport = async () => {
+        if (!omdbImportId) {
+            toast({ message: "Veuillez entrer un ID IMDb", type: 'warning' });
+            return;
+        }
+        setImportLoading(true);
+        try {
+            await moviesApi.create({ imdbId: omdbImportId });
+            toast({ message: "Film importé avec succès !", type: 'success' });
+            setOmdbImportId('');
+            fetchMovies();
+        } catch (err) {
+            toast({ message: err.response?.data?.message || t('errors.server_error'), type: 'error' });
+        } finally {
+            setImportLoading(false);
+        }
     };
 
     useEffect(() => { fetchMovies(); }, [search, page]);
@@ -82,14 +102,17 @@ export default function AdminDashboard() {
                 </button>
             </div>
 
-            {/* Search */}
-            <div style={{ position: 'relative', marginBottom: '1.25rem', maxWidth: '380px' }}>
-                <Search size={15} style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-neutral-400)', pointerEvents: 'none' }} />
-                <input
-                    type="text" value={search} onChange={e => { setSearch(e.target.value); setPage(1); }}
-                    placeholder="Chercher un film..."
-                    style={{ width: '100%', paddingLeft: '2.25rem', paddingRight: '0.75rem', paddingTop: '0.5rem', paddingBottom: '0.5rem', background: 'var(--color-neutral-900)', border: '1px solid var(--color-neutral-700)', borderRadius: 'var(--radius-pill)', color: 'var(--color-neutral-100)', fontSize: '0.875rem', outline: 'none', boxSizing: 'border-box' }}
-                />
+            {/* Toolbar (Search) */}
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.25rem' }}>
+                {/* Search */}
+                <div style={{ position: 'relative', flex: '1', minWidth: '200px', maxWidth: '380px' }}>
+                    <Search size={15} style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-neutral-400)', pointerEvents: 'none' }} />
+                    <input
+                        type="text" value={search} onChange={e => { setSearch(e.target.value); setPage(1); }}
+                        placeholder="Chercher un film dans la base..."
+                        style={{ width: '100%', paddingLeft: '2.25rem', paddingRight: '0.75rem', paddingTop: '0.5rem', paddingBottom: '0.5rem', background: 'var(--color-neutral-900)', border: '1px solid var(--color-neutral-700)', borderRadius: 'var(--radius-pill)', color: 'var(--color-neutral-100)', fontSize: '0.875rem', outline: 'none', boxSizing: 'border-box' }}
+                    />
+                </div>
             </div>
 
             {/* Table */}
@@ -189,18 +212,24 @@ export default function AdminDashboard() {
 
 function MovieForm({ initial, onSave, onClose, t }) {
     const fileRef = useRef(null);
-    const [form, setForm] = useState({
+    const [formData, setFormData] = useState({
         imdbId: initial?.imdbId || '',
         title: initial?.title || '',
+        titleVO: initial?.titleVO || '',
         year: initial?.year || '',
         genre: (initial?.genre || []).join(', '),
+        genreVO: (initial?.genreVO || []).join(', '),
         categories: (initial?.categories || []).join(', '),
         plot: initial?.plot || '',
+        plotVO: initial?.plotVO || '',
         poster: initial?.poster || '',
     });
     const [file, setFile] = useState(null);
     const [preview, setPreview] = useState(initial?.poster || '');
     const [saving, setSaving] = useState(false);
+
+    const [fetching, setFetching] = useState(false);
+    const { toast } = useToast();
 
     const handleFile = (e) => {
         const f = e.target.files[0];
@@ -209,11 +238,73 @@ function MovieForm({ initial, onSave, onClose, t }) {
         setPreview(URL.createObjectURL(f));
     };
 
+    const [suggestions, setSuggestions] = useState([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+    const debounceTimeout = useRef(null);
+
+    const handleTitleChange = (e) => {
+        const val = e.target.value;
+        setFormData(f => ({ ...f, title: val }));
+
+        if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
+
+        if (val.trim().length < 3) {
+            setSuggestions([]);
+            setShowSuggestions(false);
+            return;
+        }
+
+        debounceTimeout.current = setTimeout(async () => {
+            try {
+                const { data } = await moviesApi.getOmdbSuggestions(val);
+                if (data && data.length > 0) {
+                    setSuggestions(data);
+                    setShowSuggestions(true);
+                } else {
+                    setSuggestions([]);
+                    setShowSuggestions(false);
+                }
+            } catch (err) {
+                console.error("Erreur suggestions", err);
+            }
+        }, 400); // 400ms debounce
+    };
+
+    const handleSelectSuggestion = async (suggestion) => {
+        setShowSuggestions(false);
+        setFetching(true);
+        try {
+            const { data } = await moviesApi.getOmdbPreview(suggestion.imdbId);
+            if (data) {
+                setFormData(prev => ({
+                    ...prev,
+                    imdbId: data.imdbId || prev.imdbId,
+                    title: data.title || prev.title,
+                    titleVO: data.titleVO || prev.titleVO,
+                    year: data.year || prev.year,
+                    genre: Array.isArray(data.genre) ? data.genre.join(', ') : (data.genre || prev.genre),
+                    genreVO: Array.isArray(data.genreVO) ? data.genreVO.join(', ') : (data.genreVO || prev.genreVO),
+                    categories: Array.isArray(data.categories) ? data.categories.join(', ') : (data.categories || prev.categories),
+                    plot: data.plot || prev.plot,
+                    plotVO: data.plotVO || prev.plotVO,
+                    poster: data.poster || prev.poster,
+                    imdbRating: data.imdbRating || prev.imdbRating
+                }));
+                if (data.poster) setPreview(data.poster);
+                toast({ message: "Données appliquées !", type: 'success' });
+            }
+        } catch (err) {
+            toast({ message: "Erreur lors de la récupération des détails.", type: 'error' });
+        } finally {
+            setFetching(false);
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setSaving(true);
         const fd = new FormData();
-        Object.entries(form).forEach(([k, v]) => fd.append(k, v));
+        Object.entries(formData).forEach(([k, v]) => fd.append(k, v));
         if (file) fd.append('poster', file);
         await onSave(fd);
         setSaving(false);
@@ -225,9 +316,9 @@ function MovieForm({ initial, onSave, onClose, t }) {
                 {t(`admin.${key === 'imdbId' ? 'imdb_id' : key + '_field'}`) || key}
             </label>
             {opts.textarea ? (
-                <textarea id={`field-${key}`} value={form[key]} rows={3} onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))} style={{ ...finput, resize: 'vertical' }} />
+                <textarea id={`field-${key}`} value={formData[key] || ''} rows={3} onChange={e => setFormData(f => ({ ...f, [key]: e.target.value }))} style={{ ...finput, resize: 'vertical' }} />
             ) : (
-                <input id={`field-${key}`} type="text" value={form[key]} onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))} style={finput} />
+                <input id={`field-${key}`} type="text" value={formData[key] || ''} onChange={e => setFormData(f => ({ ...f, [key]: e.target.value }))} style={finput} />
             )}
         </div>
     );
@@ -244,14 +335,68 @@ function MovieForm({ initial, onSave, onClose, t }) {
             </div>
 
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div style={{ position: 'relative' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                        <label htmlFor="field-title" style={{ fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-neutral-400)' }}>
+                            {t('admin.title_field') || 'Titre'}
+                            {fetching && <span style={{ marginLeft: '0.5rem', color: 'var(--color-accent)', fontStyle: 'italic', textTransform: 'none' }}>Chargement...</span>}
+                        </label>
+                        <input
+                            id="field-title"
+                            type="text"
+                            value={formData.title}
+                            onChange={handleTitleChange}
+                            onFocus={() => { if (suggestions.length > 0) setShowSuggestions(true); }}
+                            onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                            style={finput}
+                            autoComplete="off"
+                        />
+                    </div>
+
+                    {showSuggestions && suggestions.length > 0 && (
+                        <div style={{
+                            position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 50,
+                            background: 'var(--color-bg-dark)', border: '1px solid var(--color-neutral-700)',
+                            borderRadius: 'var(--radius-md)', marginTop: '0.25rem', overflow: 'hidden',
+                            boxShadow: '0 4px 20px rgba(0,0,0,0.5)'
+                        }}>
+                            {suggestions.map((s, i) => (
+                                <div
+                                    key={i}
+                                    onClick={() => handleSelectSuggestion(s)}
+                                    style={{
+                                        display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.5rem 0.75rem',
+                                        cursor: 'pointer', borderBottom: i < suggestions.length - 1 ? '1px solid var(--color-neutral-800)' : 'none',
+                                        transition: 'background 0.2s'
+                                    }}
+                                    onMouseEnter={e => e.currentTarget.style.background = 'var(--color-neutral-800)'}
+                                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                                >
+                                    {s.poster ? (
+                                        <img src={s.poster} alt={s.title} style={{ width: '24px', height: '36px', objectFit: 'cover', borderRadius: '2px' }} />
+                                    ) : (
+                                        <div style={{ width: '24px', height: '36px', background: 'var(--color-neutral-700)', borderRadius: '2px' }} />
+                                    )}
+                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                        <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'white' }}>{s.title}</span>
+                                        <span style={{ fontSize: '0.7rem', color: 'var(--color-neutral-400)' }}>{s.year} • {s.imdbId}</span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                {/* ID IMDb is now purely manual or auto-filled for reference */}
                 {field('imdbId')}
-                {field('title')}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
                     {field('year')}
                     {field('genre')}
                 </div>
+                {field('genreVO')}
                 {field('categories')}
                 {field('plot', { textarea: true })}
+                {field('plotVO', { textarea: true })}
                 {field('poster')}
 
                 {/* Image upload */}
