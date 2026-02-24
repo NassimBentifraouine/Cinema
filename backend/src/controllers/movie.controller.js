@@ -1,4 +1,5 @@
 const movieService = require('../services/movie.service');
+const omdbService = require('../services/omdb.service');
 const path = require('path');
 
 const getMovies = async (req, res) => {
@@ -29,11 +30,36 @@ const createMovie = async (req, res) => {
         if (data.genre && typeof data.genre === 'string') {
             data.genre = data.genre.split(',').map((g) => g.trim());
         }
+        if (data.genreVO && typeof data.genreVO === 'string') {
+            data.genreVO = data.genreVO.split(',').map((g) => g.trim());
+        }
         if (data.categories && typeof data.categories === 'string') {
             data.categories = data.categories.split(',').map((c) => c.trim());
         }
         const movie = await movieService.createMovie(data);
         res.status(201).json(movie);
+    } catch (error) {
+        res.status(error.statusCode || 500).json({ message: error.message });
+    }
+};
+
+const getOmdbPreview = async (req, res) => {
+    try {
+        const q = req.query.q;
+        if (!q) return res.status(400).json({ message: 'Query requise (Titre ou ID)' });
+        const data = await omdbService.getMovieById(q);
+        res.json(data);
+    } catch (error) {
+        res.status(error.statusCode || 500).json({ message: error.message });
+    }
+};
+
+const getOmdbSuggestions = async (req, res) => {
+    try {
+        const q = req.query.q;
+        if (!q) return res.json([]);
+        const data = await omdbService.getSuggestions(q);
+        res.json(data);
     } catch (error) {
         res.status(error.statusCode || 500).json({ message: error.message });
     }
@@ -95,4 +121,15 @@ const deleteComment = async (req, res) => {
     }
 };
 
-module.exports = { getMovies, getMovie, createMovie, updateMovie, deleteMovie, getComments, addComment, deleteComment };
+module.exports = {
+    getMovies,
+    getMovie,
+    createMovie,
+    updateMovie,
+    deleteMovie,
+    getComments,
+    addComment,
+    deleteComment,
+    getOmdbPreview,
+    getOmdbSuggestions
+};

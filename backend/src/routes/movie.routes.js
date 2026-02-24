@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const path = require('path');
-const { getMovies, getMovie, createMovie, updateMovie, deleteMovie, getComments, addComment, deleteComment } = require('../controllers/movie.controller');
+const { getMovies, getMovie, createMovie, updateMovie, deleteMovie, getComments, addComment, deleteComment, getOmdbPreview, getOmdbSuggestions } = require('../controllers/movie.controller');
 const authMiddleware = require('../middleware/auth.middleware');
 const requireRole = require('../middleware/role.middleware');
 const { movieValidator, validate } = require('../validators/movie.validator');
@@ -30,6 +30,11 @@ const upload = multer({ storage, fileFilter, limits: { fileSize: 5 * 1024 * 1024
 
 // Public routes
 router.get('/', getMovies);
+
+// Admin / OMDb routes (Must be before /:id)
+router.get('/omdb/search', authMiddleware, requireRole('ADMIN'), getOmdbPreview);
+router.get('/omdb/suggestions', authMiddleware, requireRole('ADMIN'), getOmdbSuggestions);
+
 router.get('/:id', getMovie);
 router.get('/:id/comments', getComments);
 

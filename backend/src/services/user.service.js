@@ -2,20 +2,30 @@ const User = require('../models/User.model');
 const Movie = require('../models/Movie.model');
 const Rating = require('../models/Rating.model');
 const History = require('../models/History.model');
+const mongoose = require('mongoose');
+
+const getMovieObjectId = async (id) => {
+    if (mongoose.Types.ObjectId.isValid(id)) return id;
+    const movie = await Movie.findOne({ imdbId: id });
+    if (!movie) throw new Error('Movie not found');
+    return movie._id;
+};
 
 const addFavorite = async (userId, movieId) => {
+    const internalId = await getMovieObjectId(movieId);
     const user = await User.findByIdAndUpdate(
         userId,
-        { $addToSet: { favorites: movieId } },
+        { $addToSet: { favorites: internalId } },
         { new: true }
     ).populate('favorites');
     return user.favorites;
 };
 
 const removeFavorite = async (userId, movieId) => {
+    const internalId = await getMovieObjectId(movieId);
     const user = await User.findByIdAndUpdate(
         userId,
-        { $pull: { favorites: movieId } },
+        { $pull: { favorites: internalId } },
         { new: true }
     ).populate('favorites');
     return user.favorites;
@@ -27,8 +37,9 @@ const getFavorites = async (userId) => {
 };
 
 const rateMovie = async (userId, movieId, score) => {
+    const internalId = await getMovieObjectId(movieId);
     const rating = await Rating.findOneAndUpdate(
-        { user: userId, movie: movieId },
+        { user: userId, movie: internalId },
         { score, createdAt: new Date() },
         { upsert: true, new: true }
     );
@@ -40,11 +51,16 @@ const getRatings = async (userId) => {
 };
 
 const addHistory = async (userId, movieId) => {
-    await History.findOneAndUpdate(
-        { user: userId, movie: movieId },
-        { visitedAt: new Date() },
-        { upsert: true }
-    );
+    try {
+        const internalId = await getMovieObjectId(movieId);
+        await History.findOneAndUpdate(
+            { user: userId, movie: internalId },
+            { visitedAt: new Date() },
+            { upsert: true }
+        );
+    } catch (err) {
+        // Silently ignore history errors for unknown movies
+    }
 };
 
 const getHistory = async (userId) => {
@@ -55,7 +71,8 @@ const getHistory = async (userId) => {
 };
 
 const deleteRating = async (userId, movieId) => {
-    return Rating.findOneAndDelete({ user: userId, movie: movieId });
+    const internalId = await getMovieObjectId(movieId);
+    return Rating.findOneAndDelete({ user: userId, movie: internalId });
 };
 
 module.exports = { addFavorite, removeFavorite, getFavorites, rateMovie, getRatings, deleteRating, addHistory, getHistory };

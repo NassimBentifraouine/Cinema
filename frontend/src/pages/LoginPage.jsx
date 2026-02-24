@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Mail, Lock, Eye, EyeOff, Film } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { authApi } from '../lib/api';
 import { useAuthStore } from '../store/auth.store';
 import { useToast } from '../components/ui/Toaster';
@@ -44,23 +44,46 @@ export default function LoginPage() {
     };
 
     return (
-        <div style={{ minHeight: 'calc(100vh - 64px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem 1rem' }}>
-            <div style={{ width: '100%', maxWidth: '420px' }} className="animate-fade-in">
-                {/* Logo */}
-                <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                    <div style={{ width: '48px', height: '48px', borderRadius: 'var(--radius-lg)', background: 'var(--color-accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 0.75rem' }}>
-                        <Film size={24} color="white" />
-                    </div>
-                    <h1 style={{ margin: '0 0 0.25rem', fontSize: '1.75rem', fontWeight: 800 }}>{t('auth.login_title')}</h1>
-                    <p style={{ margin: 0, color: 'var(--color-neutral-400)', fontSize: '0.875rem' }}>Accédez à votre espace personnel</p>
+        <div style={{
+            minHeight: '100vh',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem 1rem',
+            position: 'relative', overflow: 'hidden'
+        }}>
+            {/* Cinematic Theater Background */}
+            <div style={{
+                position: 'absolute', inset: 0, zIndex: -1,
+                backgroundImage: 'url("https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=2070&auto=format&fit=crop")',
+                backgroundSize: 'cover', backgroundPosition: 'center',
+                filter: 'brightness(0.3) contrast(1.2)'
+            }} />
+
+            {/* Dark overlay gradient */}
+            <div style={{
+                position: 'absolute', inset: 0, zIndex: -1,
+                background: 'linear-gradient(to top, var(--color-bg-dark) 0%, transparent 100%)',
+            }} />
+
+            <div style={{
+                width: '100%', maxWidth: '440px',
+                backgroundColor: '#1b1212', // Slightly lighter than bg-dark for the card
+                padding: '3rem 2.5rem',
+                borderRadius: '8px',
+                boxShadow: '0 25px 50px rgba(0,0,0,0.8)',
+                border: '1px solid rgba(255,255,255,0.05)'
+            }}>
+                {/* Header */}
+                <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+                    <h1 style={{ margin: '0 0 0.5rem', fontSize: '2rem', fontWeight: 900, fontFamily: 'var(--font-family-heading)', letterSpacing: '-0.02em', color: 'white' }}>Welcome Back</h1>
+                    <p style={{ margin: 0, color: 'var(--color-neutral-400)', fontSize: '0.95rem' }}>Sign in to continue to CineView</p>
                 </div>
 
-                <form onSubmit={handleSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                    <FormField id="email" label={t('auth.email')} icon={<Mail size={16} />} error={errors.email}>
+                <form onSubmit={handleSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                    <FormField id="email" label="Email Address" icon={<Mail size={16} />} error={errors.email}>
                         <input
                             id="email"
                             type="email"
                             autoComplete="email"
+                            className="premium-input"
                             value={form.email}
                             onChange={e => { setForm(f => ({ ...f, email: e.target.value })); setErrors(v => ({ ...v, email: '' })); }}
                             placeholder="you@example.com"
@@ -68,31 +91,38 @@ export default function LoginPage() {
                         />
                     </FormField>
 
-                    <FormField id="password" label={t('auth.password')} icon={<Lock size={16} />} error={errors.password}>
+                    <FormField id="password" label="Password" icon={<Lock size={16} />} error={errors.password}>
                         <div style={{ position: 'relative' }}>
                             <input
                                 id="password"
                                 type={showPwd ? 'text' : 'password'}
                                 autoComplete="current-password"
+                                className="premium-input"
                                 value={form.password}
                                 onChange={e => { setForm(f => ({ ...f, password: e.target.value })); setErrors(v => ({ ...v, password: '' })); }}
                                 placeholder="••••••••"
-                                style={{ ...inputStyle(errors.password), paddingRight: '2.5rem' }}
+                                style={{ ...inputStyle(errors.password), paddingRight: '2.75rem' }}
                             />
-                            <button type="button" onClick={() => setShowPwd(v => !v)} style={eyeBtn} aria-label={showPwd ? 'Masquer' : 'Afficher'}>
-                                {showPwd ? <EyeOff size={15} /> : <Eye size={15} />}
+                            <button type="button" onClick={() => setShowPwd(v => !v)} style={eyeBtn} aria-label={showPwd ? 'Hide' : 'Show'}>
+                                {showPwd ? <EyeOff size={18} /> : <Eye size={18} />}
                             </button>
                         </div>
                     </FormField>
 
-                    <button type="submit" disabled={loading} style={submitBtn(loading)}>
-                        {loading ? t('auth.logging_in') : t('auth.login_btn')}
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '-0.5rem' }}>
+                        <Link to="#" style={{ fontSize: '0.8rem', color: 'var(--color-neutral-400)', textDecoration: 'underline' }}>Forgot password?</Link>
+                    </div>
+
+                    <button type="submit" disabled={loading} className="btn-primary" style={{ width: '100%', padding: '0.85rem', fontSize: '1.05rem', marginTop: '1rem', borderRadius: '4px' }}>
+                        {loading ? 'Signing in...' : 'Sign In'}
                     </button>
                 </form>
 
-                <p style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.875rem', color: 'var(--color-neutral-400)' }}>
-                    {t('auth.no_account')}{' '}
-                    <Link to="/register" style={{ color: 'var(--color-accent)', fontWeight: 600 }}>{t('auth.register_link')}</Link>
+                <p style={{ textAlign: 'center', marginTop: '2rem', fontSize: '0.9rem', color: 'var(--color-neutral-400)' }}>
+                    Don't have an account?{' '}
+                    <Link to="/register" style={{ color: 'white', fontWeight: 700 }}>
+                        Sign Up
+                    </Link>
                 </p>
             </div>
         </div>
@@ -102,32 +132,25 @@ export default function LoginPage() {
 function FormField({ id, label, icon, error, children }) {
     return (
         <div>
-            <label htmlFor={id} style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-neutral-400)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.4rem' }}>
+            <label htmlFor={id} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.8rem', fontWeight: 700, color: 'var(--color-neutral-200)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.5rem' }}>
                 {icon} {label}
             </label>
             {children}
-            {error && <p style={{ margin: '0.3rem 0 0', fontSize: '0.78rem', color: 'var(--color-accent)' }}>{error}</p>}
+            {error && <p style={{ margin: '0.4rem 0 0', fontSize: '0.8rem', color: '#ff4d4d', fontWeight: 500 }}>{error}</p>}
         </div>
     );
 }
 
 const inputStyle = (err) => ({
-    width: '100%', padding: '0.65rem 0.85rem',
-    background: 'var(--color-neutral-900)',
-    border: `1px solid ${err ? 'var(--color-accent)' : 'var(--color-neutral-700)'}`,
-    borderRadius: 'var(--radius-md)', color: 'var(--color-neutral-100)',
-    fontSize: '0.9rem', outline: 'none', boxSizing: 'border-box',
+    width: '100%', padding: '0.75rem 1rem', fontSize: '1rem',
+    backgroundColor: 'var(--color-bg-dark)',
+    border: `1px solid ${err ? '#ff4d4d' : 'var(--color-neutral-800)'}`,
+    color: 'white',
+    borderRadius: '4px',
+    outline: 'none'
 });
 
 const eyeBtn = {
-    position: 'absolute', right: '0.65rem', top: '50%', transform: 'translateY(-50%)',
-    background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-neutral-400)', display: 'flex',
+    position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)',
+    background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-neutral-400)', display: 'flex'
 };
-
-const submitBtn = (loading) => ({
-    padding: '0.75rem', borderRadius: 'var(--radius-pill)',
-    background: loading ? 'var(--color-neutral-700)' : 'var(--color-accent)',
-    color: 'white', fontWeight: 700, fontSize: '0.95rem',
-    border: 'none', cursor: loading ? 'wait' : 'pointer',
-    transition: 'all 0.2s',
-});

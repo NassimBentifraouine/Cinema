@@ -1,21 +1,27 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Film, Menu, X, Globe, User, LogOut, Settings, Heart } from 'lucide-react';
+import { User, LogOut, Settings } from 'lucide-react';
 import { useAuthStore } from '../store/auth.store';
+import { useFiltersStore } from '../store/filters.store';
 
 export default function Navbar() {
     const { t, i18n } = useTranslation();
     const { isAuthenticated, user, logout, isAdmin } = useAuthStore();
     const navigate = useNavigate();
-    const [menuOpen, setMenuOpen] = useState(false);
+    const [scrolled, setScrolled] = useState(false);
     const [userMenuOpen, setUserMenuOpen] = useState(false);
 
-    const toggleLang = () => {
-        const next = i18n.language === 'fr' ? 'en' : 'fr';
-        i18n.changeLanguage(next);
-        localStorage.setItem('cinecat_lang', next);
-    };
+    // For local search state that syncs with global store
+    const { search, setSearch } = useFiltersStore();
+
+    useEffect(() => {
+        const handleScroll = () => {
+            setScrolled(window.scrollY > 10);
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     const handleLogout = () => {
         logout();
@@ -23,132 +29,156 @@ export default function Navbar() {
         navigate('/');
     };
 
+
+
     return (
-        <nav className="glass sticky top-0 z-50" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-            <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 1.5rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '64px' }}>
-                    {/* Logo */}
-                    <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <div style={{
-                            width: '32px', height: '32px', borderRadius: '8px',
-                            background: 'var(--color-accent)', display: 'flex', alignItems: 'center', justifyContent: 'center'
-                        }}>
-                            <Film size={18} color="white" />
-                        </div>
-                        <span style={{ fontWeight: 700, fontSize: '1.25rem', letterSpacing: '-0.02em' }}>
-                            Ciné<span style={{ color: 'var(--color-accent)' }}>Catalog</span>
-                        </span>
-                    </Link>
-
-                    {/* Desktop nav */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                        {/* Language toggle */}
-                        <button
-                            onClick={toggleLang}
-                            aria-label="Toggle language"
-                            style={{
-                                display: 'flex', alignItems: 'center', gap: '0.3rem',
-                                padding: '0.4rem 0.75rem', borderRadius: 'var(--radius-pill)',
-                                border: '1px solid var(--color-neutral-700)',
-                                background: 'transparent', color: 'var(--color-neutral-200)',
-                                cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600,
-                                transition: 'all 0.2s',
-                            }}
-                            onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--color-accent)'}
-                            onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--color-neutral-700)'}
-                        >
-                            <Globe size={14} />
-                            {i18n.language.toUpperCase()}
-                        </button>
-
-                        {isAuthenticated ? (
-                            <div style={{ position: 'relative' }}>
-                                <button
-                                    onClick={() => setUserMenuOpen(!userMenuOpen)}
-                                    aria-label="User menu"
-                                    aria-expanded={userMenuOpen}
-                                    style={{
-                                        display: 'flex', alignItems: 'center', gap: '0.5rem',
-                                        padding: '0.4rem 0.75rem', borderRadius: 'var(--radius-pill)',
-                                        border: '1px solid var(--color-neutral-700)',
-                                        background: 'var(--color-neutral-900)', color: 'var(--color-neutral-100)',
-                                        cursor: 'pointer', fontSize: '0.875rem', fontWeight: 500,
-                                        transition: 'all 0.2s',
-                                    }}
-                                >
-                                    <User size={16} />
-                                    {user?.email?.split('@')[0]}
-                                </button>
-                                {userMenuOpen && (
-                                    <div
-                                        style={{
-                                            position: 'absolute', right: 0, top: 'calc(100% + 8px)',
-                                            background: 'var(--color-bg-elevated)',
-                                            border: '1px solid var(--color-neutral-700)',
-                                            borderRadius: 'var(--radius-lg)', padding: '0.5rem',
-                                            minWidth: '180px', boxShadow: '0 20px 40px rgba(0,0,0,0.5)',
-                                            zIndex: 100,
-                                        }}
-                                        className="animate-scale-in"
-                                    >
-                                        <NavMenuItem icon={<Heart size={15} />} label={t('nav.favorites')} to="/dashboard" onClick={() => setUserMenuOpen(false)} />
-                                        {isAdmin() && (
-                                            <NavMenuItem icon={<Settings size={15} />} label={t('nav.admin')} to="/admin" onClick={() => setUserMenuOpen(false)} />
-                                        )}
-                                        <hr style={{ border: 'none', borderTop: '1px solid var(--color-neutral-700)', margin: '0.25rem 0' }} />
-                                        <button
-                                            onClick={handleLogout}
-                                            style={{
-                                                display: 'flex', alignItems: 'center', gap: '0.5rem',
-                                                width: '100%', padding: '0.5rem 0.75rem',
-                                                borderRadius: 'var(--radius-sm)', border: 'none',
-                                                background: 'transparent', color: 'var(--color-accent)',
-                                                cursor: 'pointer', fontSize: '0.875rem', textAlign: 'left',
-                                                transition: 'background 0.2s',
-                                            }}
-                                            onMouseEnter={e => e.currentTarget.style.background = 'var(--color-accent-muted)'}
-                                            onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-                                        >
-                                            <LogOut size={15} />
-                                            {t('nav.logout')}
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
-                        ) : (
-                            <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                <NavLink to="/login">{t('nav.login')}</NavLink>
-                                <NavLink to="/register" accent>{t('nav.register')}</NavLink>
-                            </div>
-                        )}
+        <nav
+            style={{
+                position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50,
+                background: scrolled ? 'var(--color-bg-dark)' : 'transparent',
+                transition: 'background-color 0.3s ease',
+                padding: '0 4%',
+                height: '72px',
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                borderBottom: scrolled ? '1px solid rgba(255,255,255,0.05)' : 'none'
+            }}
+        >
+            {/* Left side: Logo & Primary Links */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '3rem' }}>
+                {/* Logo */}
+                <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', outline: 'none' }}>
+                    {/* Red Square Icon similar to mockup */}
+                    <div style={{
+                        width: '24px', height: '24px',
+                        backgroundColor: 'var(--color-accent)',
+                        borderRadius: '4px',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center'
+                    }}>
+                        {/* Could put a small white icon inside, but mockup is just a simple shape */}
+                        <div style={{ width: '12px', height: '12px', background: 'white', borderRadius: '2px', marginLeft: '4px', marginTop: '-4px' }} />
                     </div>
+                    <span style={{
+                        fontFamily: 'var(--font-family-sans)', fontWeight: 800,
+                        fontSize: '1.4rem', letterSpacing: '-0.03em', color: 'var(--color-white)',
+                    }}>
+                        CineView
+                    </span>
+                </Link>
+
+                {/* Desktop nav links */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
+                    <Link to="/" style={{ fontSize: '0.9rem', fontWeight: 500, color: 'var(--color-white)' }}>
+                        {t('nav.catalog')}
+                    </Link>
+                    {isAuthenticated && (
+                        <Link to="/dashboard" style={{ fontSize: '0.9rem', fontWeight: 500, color: 'var(--color-neutral-400)' }} onMouseEnter={e => e.currentTarget.style.color = 'white'} onMouseLeave={e => e.currentTarget.style.color = 'var(--color-neutral-400)'}>
+                            {t('nav.dashboard')}
+                        </Link>
+                    )}
+                    {isAdmin() && (
+                        <Link to="/admin" style={{ fontSize: '0.9rem', fontWeight: 500, color: 'var(--color-accent)' }} onMouseEnter={e => e.currentTarget.style.color = 'white'} onMouseLeave={e => e.currentTarget.style.color = 'var(--color-accent)'}>
+                            {t('nav.admin')}
+                        </Link>
+                    )}
                 </div>
             </div>
-            {/* Close dropdown on outside click */}
+
+            {/* Right side: Search, Notifications, Profile */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+
+
+
+                {/* Language Toggles */}
+                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginLeft: '0.5rem' }}>
+                    <button
+                        onClick={() => i18n.changeLanguage('fr')}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', opacity: i18n.language === 'fr' ? 1 : 0.5, transition: 'opacity 0.2s', padding: 0 }}
+                        title="Français"
+                    >🇫🇷</button>
+                    <button
+                        onClick={() => i18n.changeLanguage('en')}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', opacity: i18n.language === 'en' ? 1 : 0.5, transition: 'opacity 0.2s', padding: 0 }}
+                        title="English"
+                    >🇬🇧</button>
+                </div>
+
+                {isAuthenticated ? (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+                        {/* Profil Menu */}
+
+                        {/* Profile Menu */}
+                        <div style={{ position: 'relative' }}>
+                            <button
+                                onClick={() => setUserMenuOpen(!userMenuOpen)}
+                                style={{
+                                    background: 'transparent', border: 'none', padding: 0,
+                                    cursor: 'pointer', display: 'flex', alignItems: 'center'
+                                }}
+                            >
+                                <div style={{
+                                    width: '36px', height: '36px', borderRadius: '50%',
+                                    background: 'url("https://api.dicebear.com/7.x/avataaars/svg?seed=Felix&backgroundColor=e50914") center/cover',
+                                    border: '2px solid transparent',
+                                    transition: 'border-color 0.2s'
+                                }} onMouseEnter={e => e.currentTarget.style.borderColor = 'white'} onMouseLeave={e => e.currentTarget.style.borderColor = 'transparent'} />
+                            </button>
+
+                            {userMenuOpen && (
+                                <div
+                                    style={{
+                                        position: 'absolute', right: 0, top: 'calc(100% + 12px)',
+                                        minWidth: '220px', zIndex: 100,
+                                        backgroundColor: 'var(--color-bg-elevated)', border: '1px solid var(--color-neutral-800)',
+                                        borderRadius: 'var(--radius-md)',
+                                        padding: '0.5rem 0',
+                                        boxShadow: '0 10px 30px rgba(0,0,0,0.5)'
+                                    }}
+                                >
+                                    <div style={{ padding: '0.5rem 1rem', fontSize: '0.85rem', color: 'var(--color-neutral-400)', borderBottom: '1px solid var(--color-neutral-800)', marginBottom: '0.5rem' }}>
+                                        <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t('nav.dashboard')}</div>
+                                        <strong style={{ color: 'white' }}>{user?.email}</strong>
+                                    </div>
+                                    <NavMenuItem icon={<User size={16} />} label={t('nav.dashboard')} to="/dashboard" onClick={() => setUserMenuOpen(false)} />
+                                    {isAdmin() && (
+                                        <NavMenuItem icon={<Settings size={16} />} label={t('nav.admin')} to="/admin" onClick={() => setUserMenuOpen(false)} />
+                                    )}
+                                    <hr style={{ border: 'none', borderTop: '1px solid var(--color-neutral-800)', margin: '0.5rem 0' }} />
+                                    <button
+                                        onClick={handleLogout}
+                                        style={{
+                                            display: 'flex', alignItems: 'center', gap: '0.6rem',
+                                            width: '100%', padding: '0.6rem 1rem',
+                                            border: 'none', background: 'transparent', color: 'var(--color-neutral-200)',
+                                            cursor: 'pointer', fontSize: '0.9rem', fontWeight: 500,
+                                            textAlign: 'left'
+                                        }}
+                                        onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.color = 'white' }}
+                                        onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--color-neutral-200)' }}
+                                    >
+                                        <LogOut size={16} />
+                                        {t('nav.logout')}
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                ) : (
+                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                        <Link to="/login" style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--color-white)' }}>
+                            {t('nav.login')}
+                        </Link>
+                        <Link to="/register" className="btn-primary" style={{ padding: '0.5rem 1.25rem', borderRadius: 'var(--radius-pill)' }}>
+                            {t('nav.register')}
+                        </Link>
+                    </div>
+                )}
+            </div>
+
+            {/* Click outside overlay */}
             {userMenuOpen && (
                 <div style={{ position: 'fixed', inset: 0, zIndex: 40 }} onClick={() => setUserMenuOpen(false)} />
             )}
         </nav>
-    );
-}
-
-function NavLink({ to, children, accent }) {
-    return (
-        <Link
-            to={to}
-            style={{
-                padding: '0.4rem 0.9rem',
-                borderRadius: 'var(--radius-pill)',
-                fontSize: '0.875rem',
-                fontWeight: 500,
-                transition: 'all 0.2s',
-                background: accent ? 'var(--color-accent)' : 'transparent',
-                color: accent ? 'white' : 'var(--color-neutral-200)',
-                border: accent ? 'none' : '1px solid var(--color-neutral-700)',
-            }}
-        >
-            {children}
-        </Link>
     );
 }
 
@@ -158,13 +188,12 @@ function NavMenuItem({ icon, label, to, onClick }) {
             to={to}
             onClick={onClick}
             style={{
-                display: 'flex', alignItems: 'center', gap: '0.5rem',
-                padding: '0.5rem 0.75rem', borderRadius: 'var(--radius-sm)',
-                color: 'var(--color-neutral-200)', fontSize: '0.875rem',
-                transition: 'background 0.2s',
+                display: 'flex', alignItems: 'center', gap: '0.6rem',
+                padding: '0.5rem 1rem', color: 'var(--color-neutral-200)',
+                fontSize: '0.9rem', fontWeight: 500, transition: 'all 0.2s'
             }}
-            onMouseEnter={e => e.currentTarget.style.background = 'var(--color-neutral-900)'}
-            onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.color = 'white' }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--color-neutral-200)' }}
         >
             {icon}
             {label}

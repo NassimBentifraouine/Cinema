@@ -1,6 +1,7 @@
 const Movie = require('../models/Movie.model');
 const Rating = require('../models/Rating.model');
 const Comment = require('../models/Comment.model');
+const User = require('../models/User.model');
 const omdbService = require('./omdb.service');
 
 /**
@@ -87,11 +88,7 @@ const getMovieDetail = async (movieId) => {
 const createMovie = async (data) => {
     // If imdbId provided, hydrate from OMDb first
     if (data.imdbId) {
-        try {
-            return await omdbService.getMovieById(data.imdbId);
-        } catch (_) {
-            // Fall through to manual creation
-        }
+        return await omdbService.getMovieById(data.imdbId);
     }
     return Movie.create(data);
 };
@@ -105,6 +102,21 @@ const updateMovie = async (id, data) => {
 const deleteMovie = async (id) => {
     const movie = await Movie.findByIdAndDelete(id);
     if (!movie) throw Object.assign(new Error('Film non trouvé'), { statusCode: 404 });
+
+    // Clean up related data (Cascading Deletes)
+    await Rating.deleteMany({ movie: id });
+    await Comment.deleteMany({ movie: id });
+    await User.updateMany(
+        {},
+        {
+            $pull: {
+                favorites: id,
+                watchlist: id,
+                history: { movie: id }
+            }
+        }
+    );
+
     return movie;
 };
 
