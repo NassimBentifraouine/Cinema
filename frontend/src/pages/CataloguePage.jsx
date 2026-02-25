@@ -125,24 +125,24 @@ export default function CataloguePage() {
                         </div>
 
                         {/* Tiny layout toggle buttons */}
-                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <div style={{ display: 'flex', gap: '0.75rem' }}>
                             <Button
                                 variant={viewMode === 'grid' ? 'primary' : 'outline'}
                                 size="sm"
                                 padding="0.5rem"
                                 onClick={() => setViewMode('grid')}
-                                style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                style={{ width: '48px', height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                             >
-                                <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><rect width="6" height="6" /><rect width="6" height="6" x="8" /><rect width="6" height="6" y="8" /><rect width="6" height="6" x="8" y="8" /></svg>
+                                <svg width="28" height="28" viewBox="0 0 14 14" fill="currentColor"><rect width="6" height="6" /><rect width="6" height="6" x="8" /><rect width="6" height="6" y="8" /><rect width="6" height="6" x="8" y="8" /></svg>
                             </Button>
                             <Button
                                 variant={viewMode === 'list' ? 'primary' : 'outline'}
                                 size="sm"
                                 padding="0.5rem"
                                 onClick={() => setViewMode('list')}
-                                style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                style={{ width: '48px', height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                             >
-                                <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><rect width="14" height="4" /><rect width="14" height="4" y="5" /><rect width="14" height="4" y="10" /></svg>
+                                <svg width="28" height="28" viewBox="0 0 14 14" fill="currentColor"><rect width="14" height="4" /><rect width="14" height="4" y="5" /><rect width="14" height="4" y="10" /></svg>
                             </Button>
                         </div>
                     </div>

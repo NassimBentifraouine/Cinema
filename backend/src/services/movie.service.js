@@ -35,6 +35,11 @@ const getMovies = async ({ search, genre, minRating, sort, page, limit, autoImpo
     else if (sort === 'date') sortObj = { year: -1 };
     else if (sort === 'title') sortObj = { title: 1 };
 
+    // Filter for only explicitly added movies unless searching
+    if (!search && !genre && !minRating) {
+        query.isExplicitlyAdded = true;
+    }
+
     // If search and no local results, fetch from OMDb
     if (search && autoImport) {
         const localCount = await Movie.countDocuments(query);
@@ -43,8 +48,36 @@ const getMovies = async ({ search, genre, minRating, sort, page, limit, autoImpo
         }
     }
 
+    const pipeline = [
+        { $match: query },
+        {
+            $lookup: {
+                from: Rating.collection.name,
+                localField: '_id',
+                foreignField: 'movie',
+                as: 'communityRatings'
+            }
+        },
+        {
+            $addFields: {
+                communityRating: {
+                    $cond: [
+                        { $gt: [{ $size: "$communityRatings" }, 0] },
+                        { $round: [{ $avg: "$communityRatings.score" }, 1] },
+                        0
+                    ]
+                },
+                communityVotes: { $size: "$communityRatings" }
+            }
+        },
+        { $project: { communityRatings: 0 } },
+        { $sort: sortObj },
+        { $skip: skip },
+        { $limit: limitNum }
+    ];
+
     const [movies, total] = await Promise.all([
-        Movie.find(query).sort(sortObj).skip(skip).limit(limitNum),
+        Movie.aggregate(pipeline),
         Movie.countDocuments(query),
     ]);
 
@@ -90,7 +123,7 @@ const createMovie = async (data) => {
     if (data.imdbId) {
         return await omdbService.getMovieById(data.imdbId);
     }
-    return Movie.create(data);
+    return Movie.create({ ...data, isExplicitlyAdded: true });
 };
 
 const updateMovie = async (id, data) => {

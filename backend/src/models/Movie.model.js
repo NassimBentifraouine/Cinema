@@ -77,6 +77,19 @@ const movieSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
+    isExplicitlyAdded: {
+        type: Boolean,
+        default: false,
+    },
+    // Dynamically added by aggregation
+    communityRating: {
+        type: Number,
+        default: 0,
+    },
+    communityVotes: {
+        type: Number,
+        default: 0,
+    },
 });
 
 // Text index for search
