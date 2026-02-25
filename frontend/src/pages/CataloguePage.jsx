@@ -38,7 +38,7 @@ export default function CataloguePage() {
         if (r) setMinRating(r);
         if (so) setSort(so);
         if (p > 1) setPage(p);
-    }, []); // eslint-disable-line
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     // Sync store → URL
     useEffect(() => {
@@ -49,10 +49,11 @@ export default function CataloguePage() {
         if (sort) params.sort = sort;
         if (page > 1) params.page = page;
         setSearchParams(params, { replace: true });
-    }, [search, genre, minRating, sort, page]);
+    }, [search, genre, minRating, sort, page, setSearchParams]);
 
     // Fetch movies
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setLoading(true);
         moviesApi.getAll({ search, genre, minRating, sort, page, limit })
             .then(r => {

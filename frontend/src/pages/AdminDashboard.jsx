@@ -19,12 +19,9 @@ export default function AdminDashboard() {
     const [debouncedSearch, setDebouncedSearch] = useState('');
     const [loading, setLoading] = useState(true);
     const [isSearching, setIsSearching] = useState(false);
-    const [importLoading, setImportLoading] = useState(false);
-    const [omdbImportId, setOmdbImportId] = useState('');
     const [modalOpen, setModalOpen] = useState(false);
     const [editMovie, setEditMovie] = useState(null);
     const [deleteId, setDeleteId] = useState(null);
-    const modalRef = useRef(null);
 
     // Debounce search
     useEffect(() => {
@@ -50,7 +47,9 @@ export default function AdminDashboard() {
             });
     };
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchMovies(loading && search === ''); // Only full loading on first mount
     }, [debouncedSearch, page]);
 
@@ -81,9 +80,8 @@ export default function AdminDashboard() {
             }
             closeModal();
             fetchMovies();
-        } catch (err) {
-            const msg = err.response?.data?.message || t('errors.server_error');
-            toast({ message: msg, type: 'error' });
+        } catch {
+            toast({ message: t('errors.server_error'), type: 'error' });
         }
     };
 
@@ -355,7 +353,7 @@ const MovieForm = ({ initial, onSave, onClose, t }) => {
                 if (data.poster) setPreview(data.poster);
                 toast({ message: "Données appliquées !", type: 'success' });
             }
-        } catch (err) {
+        } catch {
             toast({ message: "Erreur lors de la récupération des détails.", type: 'error' });
         } finally {
             setFetching(false);
@@ -599,7 +597,3 @@ const finput = {
     transition: 'all 0.2s',
     boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.1)'
 };
-const accentBtn = {};
-const ghostBtn = {};
-const dangerBtn = {};
-const paginBtn = () => ({}); 

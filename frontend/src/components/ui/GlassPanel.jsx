@@ -5,7 +5,6 @@ export default function GlassPanel({
     className = '',
     style = {},
     padding = '2rem',
-    opacity = 0.98,
     blur = '24px',
     borderRadius = '1.25rem',
     border = '1px solid rgba(255, 255, 255, 0.12)',

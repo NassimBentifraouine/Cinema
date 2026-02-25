@@ -1,6 +1,5 @@
 const movieService = require('../services/movie.service');
 const omdbService = require('../services/omdb.service');
-const path = require('path');
 
 const getMovies = async (req, res) => {
     try {

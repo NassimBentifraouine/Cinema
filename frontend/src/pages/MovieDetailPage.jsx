@@ -120,22 +120,10 @@ export default function MovieDetailPage() {
         ? `http://localhost:3001${movie.customPoster}`
         : movie.poster || PLACEHOLDER_POSTER;
 
-    // Fake related movies since backend doesn't provide them, using same poster
-    const relatedFake = [1, 2, 3];
-    // Fake Cast
-    const fakeCast = [
-        { name: 'Matthew McConaughey', role: 'Cooper' },
-        { name: 'Anne Hathaway', role: 'Brand' },
-        { name: 'Jessica Chastain', role: 'Murph' },
-        { name: 'Michael Caine', role: 'Professor Brand' },
-        { name: 'Casey Affleck', role: 'Tom' }
-    ];
-
     const isEn = i18n.language === 'en';
     const displayTitle = (isEn && movie.titleVO) ? movie.titleVO : movie.title;
     const displayPlot = (isEn && movie.plotVO) ? movie.plotVO : movie.plot;
     const displayGenre = (isEn && movie.genreVO?.length > 0) ? movie.genreVO : movie.genre;
-    const displayLanguage = movie.language;
 
     return (
         <main className="animate-fade-in-slow" style={{ minHeight: '100vh', paddingBottom: '4rem' }}>
