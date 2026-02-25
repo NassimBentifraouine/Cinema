@@ -354,6 +354,7 @@ const MovieForm = ({ initial, onSave, onClose, t }) => {
             }
         } catch {
             toast({ message: t('admin.fetch_error'), type: 'error' });
+            toast({ message: t('admin.fetch_error'), type: 'error' });
         } finally {
             setFetching(false);
         }
