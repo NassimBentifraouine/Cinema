@@ -1,26 +1,12 @@
 services:
-  mongo:
-    image: mongo:7
-    container_name: cinema_mongo
-    restart: unless-stopped
-    volumes:
-      - mongo_data:/data/db
-    ports:
-      - '27017:27017'
-    networks:
-      - cinema_net
-
   backend:
     build: ./backend
     container_name: cinema_backend
     restart: unless-stopped
     env_file: ./backend/.env
-    environment:
-      MONGO_URI: mongodb://mongo:27017/cinema
+    # Pass MONGO_URI from .env file
     ports:
       - '3001:3001'
-    depends_on:
-      - mongo
     volumes:
       - ./backend/uploads:/app/uploads
     networks:
@@ -36,10 +22,6 @@ services:
       - backend
     networks:
       - cinema_net
-
-volumes:
-  mongo_data:
-
 
 networks:
   cinema_net:
