@@ -59,4 +59,4 @@ export const userApi = {
     addHistory: (movieId) => api.post(`/users/history/${movieId}`),
 };
 
-export default api;
+

@@ -3,7 +3,7 @@ import { Star, Heart, User } from 'lucide-react';
 import { useAuthStore } from '../store/auth.store';
 import { useTranslation } from 'react-i18next';
 
-// UI Components
+
 import GlassPanel from './ui/GlassPanel';
 import Button from './ui/Button';
 

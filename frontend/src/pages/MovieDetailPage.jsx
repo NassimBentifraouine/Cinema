@@ -8,7 +8,7 @@ import StarRating from '../components/StarRating';
 import { useAuthStore } from '../store/auth.store';
 import { useToast } from '../components/ui/Toaster';
 
-// UI Components
+
 import GlassPanel from '../components/ui/GlassPanel';
 import Button from '../components/ui/Button';
 
@@ -47,7 +47,7 @@ export default function MovieDetailPage() {
             if (found) setUserRating(found.score);
         }).catch(() => { });
 
-        // Add to history
+
         if (movie?._id) userApi.addHistory(movie._id).catch(() => { });
     }, [isAuthenticated, id, movie?._id]);
 

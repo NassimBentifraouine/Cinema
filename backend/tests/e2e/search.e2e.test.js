@@ -9,9 +9,9 @@ beforeAll(async () => {
     await mongoose.connect(TEST_DB);
     // Seed some movies
     await Movie.create([
-        { imdbId: 'tt0000001', title: 'Batman Begins', year: '2005', genre: ['Action'], imdbRating: 8.2 },
-        { imdbId: 'tt0000002', title: 'The Dark Knight', year: '2008', genre: ['Action', 'Crime'], imdbRating: 9.0 },
-        { imdbId: 'tt0000003', title: 'Inception', year: '2010', genre: ['Sci-Fi'], imdbRating: 8.8 },
+        { imdbId: 'tt0000001', title: 'Batman Begins', year: '2005', genre: ['Action'], imdbRating: 8.2, isExplicitlyAdded: true },
+        { imdbId: 'tt0000002', title: 'The Dark Knight', year: '2008', genre: ['Action', 'Crime'], imdbRating: 9.0, isExplicitlyAdded: true },
+        { imdbId: 'tt0000003', title: 'Inception', year: '2010', genre: ['Sci-Fi'], imdbRating: 8.8, isExplicitlyAdded: true },
     ]);
 });
 

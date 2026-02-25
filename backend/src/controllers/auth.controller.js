@@ -6,7 +6,7 @@ const register = async (req, res, next) => {
         const result = await authService.register({ email, password });
         res.status(201).json(result);
     } catch (error) {
-        console.error('[auth.register] error:', error.stack || error.message);
+        // Pass to error handler
         next(error);
     }
 };
@@ -17,7 +17,7 @@ const login = async (req, res, next) => {
         const result = await authService.login({ email, password });
         res.json(result);
     } catch (error) {
-        console.error('[auth.login] error:', error.stack || error.message);
+        // Pass to error handler
         next(error);
     }
 };

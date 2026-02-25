@@ -4,7 +4,7 @@ import { User, LogOut, Settings } from 'lucide-react';
 import { useAuthStore } from '../store/auth.store';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 
-// UI Components
+
 import Logo from './ui/Logo';
 import NavLink from './ui/NavLink';
 import LangButton from './ui/LangButton';

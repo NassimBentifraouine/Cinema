@@ -48,7 +48,7 @@ app.use((req, res) => {
 // Error handler
 app.use((err, req, res, next) => {
     console.error(err.stack);
-    res.status(err.status || 500).json({ message: err.message || 'Erreur serveur' });
+    res.status(err.statusCode || err.status || 500).json({ message: err.message || 'Erreur serveur' });
 });
 
 const PORT = process.env.PORT || 3001;

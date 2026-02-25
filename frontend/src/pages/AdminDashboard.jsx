@@ -4,7 +4,7 @@ import { Plus, Edit, Trash2, X, Search, Upload } from 'lucide-react';
 import { moviesApi } from '../lib/api';
 import { useToast } from '../components/ui/Toaster';
 
-// UI Components
+
 import GlassPanel from '../components/ui/GlassPanel';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
@@ -85,10 +85,10 @@ export default function AdminDashboard() {
         }
     };
 
-    // Close modal on outside click
+
     const handleModalBg = (e) => { if (e.target === e.currentTarget) closeModal(); };
 
-    // Keyboard: close on Escape
+
     useEffect(() => {
         const handler = (e) => { if (e.key === 'Escape') { closeModal(); setDeleteId(null); } };
         window.addEventListener('keydown', handler);
@@ -324,7 +324,7 @@ const MovieForm = ({ initial, onSave, onClose, t }) => {
                     setShowSuggestions(false);
                 }
             } catch (err) {
-                console.error("Erreur suggestions", err);
+                // Silently ignore or show UI error
             }
         }, 400);
     };
@@ -353,11 +353,8 @@ const MovieForm = ({ initial, onSave, onClose, t }) => {
                 toast({ message: t('admin.data_applied'), type: 'success' });
             }
         } catch {
-<<<<<<< fix/ui-translations-and-components
             toast({ message: t('admin.fetch_error'), type: 'error' });
-=======
-            toast({ message: "Erreur lors de la récupération des détails.", type: 'error' });
->>>>>>> main
+            toast({ message: t('admin.fetch_error'), type: 'error' });
         } finally {
             setFetching(false);
         }

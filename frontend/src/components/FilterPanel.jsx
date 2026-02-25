@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { SlidersHorizontal, Search } from 'lucide-react';
 import { useFiltersStore } from '../store/filters.store';
 
-// UI Components
+
 import GlassPanel from './ui/GlassPanel';
 import Input from './ui/Input';
 import Button from './ui/Button';
