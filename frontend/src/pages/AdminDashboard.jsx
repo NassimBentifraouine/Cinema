@@ -353,7 +353,11 @@ const MovieForm = ({ initial, onSave, onClose, t }) => {
                 toast({ message: t('admin.data_applied'), type: 'success' });
             }
         } catch {
+<<<<<<< fix/ui-translations-and-components
             toast({ message: t('admin.fetch_error'), type: 'error' });
+=======
+            toast({ message: "Erreur lors de la récupération des détails.", type: 'error' });
+>>>>>>> main
         } finally {
             setFetching(false);
         }
