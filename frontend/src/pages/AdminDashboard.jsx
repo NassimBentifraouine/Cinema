@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+﻿import { useEffect, useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Plus, Edit, Trash2, X, Search, Upload } from 'lucide-react';
 import { moviesApi } from '../lib/api';
@@ -115,9 +115,8 @@ export default function AdminDashboard() {
                 }}>
                     {t('admin.movies')}
                 </h1>
-                <p style={{ margin: '0.75rem 0 0', color: 'var(--color-neutral-400)', fontSize: '1rem', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <span style={{ color: 'var(--color-neutral-100)', fontWeight: 700 }}>{total}</span>
-                    {t('admin.movies_count', 'films répertoriés')}
+                <p style={{ margin: '0.5rem 0 0', color: 'var(--color-neutral-400)', fontSize: '1.05rem', fontWeight: 500 }}>
+                    <strong style={{ color: 'white', fontWeight: 900 }}>{total}</strong> {t('admin.movies_count')}
                 </p>
             </header>
 
@@ -135,7 +134,7 @@ export default function AdminDashboard() {
                 <div style={{ position: 'relative', flex: '1', minWidth: '280px', maxWidth: '500px', opacity: isSearching ? 0.7 : 1, transition: 'opacity 0.2s' }}>
                     <Input
                         icon={Search}
-                        placeholder="Rechercher un film dans la base..."
+                        placeholder={t('admin.search_placeholder')}
                         value={search}
                         onChange={e => { setSearch(e.target.value); setPage(1); }}
                         style={{
@@ -176,7 +175,7 @@ export default function AdminDashboard() {
                 <table style={{ width: '100%', borderCollapse: 'collapse' }} aria-label="Gestion des films">
                     <thead>
                         <tr style={{ borderBottom: '1px solid var(--color-neutral-800)' }}>
-                            {['Poster', 'Titre', 'Année', 'Note IMDb', 'Genres', 'Actions'].map(h => (
+                            {[t('admin.col_poster'), t('admin.col_title'), t('admin.col_year'), t('admin.col_imdb_rating'), t('admin.col_genres'), t('admin.col_actions')].map(h => (
                                 <th key={h} style={{ padding: '1.25rem 1.5rem', textAlign: 'left', fontSize: '0.72rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'var(--color-neutral-400)' }}>{h}</th>
                             ))}
                         </tr>
@@ -203,7 +202,7 @@ export default function AdminDashboard() {
                                 </td>
                                 <td style={{ padding: '1rem 1.5rem', fontSize: '0.9rem', color: 'var(--color-neutral-400)', fontWeight: 600 }}>{movie.year}</td>
                                 <td style={{ padding: '1rem 1.5rem', fontSize: '0.95rem', color: 'var(--color-gold)', fontWeight: 800 }}>
-                                    {movie.imdbRating > 0 ? `⭐ ${movie.imdbRating.toFixed(1)}` : '—'}
+                                    {movie.imdbRating > 0 ? `â­ ${movie.imdbRating.toFixed(1)}` : 'â€”'}
                                 </td>
                                 <td style={{ padding: '1rem 1.5rem', fontSize: '0.78rem', maxWidth: '200px' }}>
                                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem' }}>
@@ -225,7 +224,7 @@ export default function AdminDashboard() {
                             </tr>
                         ))}
                         {!loading && movies.length === 0 && (
-                            <tr><td colSpan={6} style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-neutral-400)' }}>Aucun film trouvé</td></tr>
+                            <tr><td colSpan={6} style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-neutral-400)' }}>{t('admin.no_movies')}</td></tr>
                         )}
                     </tbody>
                 </table>
@@ -233,10 +232,10 @@ export default function AdminDashboard() {
                 {/* Table pagination */}
                 {total > 15 && (
                     <div style={{ padding: '0.75rem 1rem', borderTop: '1px solid var(--color-neutral-800)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ fontSize: '0.8rem', color: 'var(--color-neutral-400)' }}>Page {page} · {total} films</span>
+                        <span style={{ fontSize: '0.8rem', color: 'var(--color-neutral-400)' }}>{t('admin.page_info_admin', { page, total })}</span>
                         <div style={{ display: 'flex', gap: '0.4rem' }}>
-                            <Button variant="outline" size="sm" onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}>← Préc.</Button>
-                            <Button variant="outline" size="sm" onClick={() => setPage(p => p + 1)} disabled={page * 15 >= total}>Suiv. →</Button>
+                            <Button variant="outline" size="sm" onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}>{t('admin.prev')}</Button>
+                            <Button variant="outline" size="sm" onClick={() => setPage(p => p + 1)} disabled={page * 15 >= total}>{t('admin.next')}</Button>
                         </div>
                     </div>
                 )}
@@ -256,7 +255,7 @@ export default function AdminDashboard() {
                 deleteId && (
                     <ModalOverlay onClose={() => setDeleteId(null)}>
                         <GlassPanel padding="2rem" style={{ maxWidth: '380px', width: '100%' }}>
-                            <h2 style={{ margin: '0 0 0.75rem', fontSize: '1.1rem', fontWeight: 700 }}>Supprimer le film</h2>
+                            <h2 style={{ margin: '0 0 0.75rem', fontSize: '1.1rem', fontWeight: 700 }}>{t('admin.title')}</h2>
                             <p style={{ color: 'var(--color-neutral-400)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>{t('admin.confirm_delete')}</p>
                             <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
                                 <Button variant="ghost" onClick={() => setDeleteId(null)}>{t('admin.cancel')}</Button>
@@ -351,10 +350,14 @@ const MovieForm = ({ initial, onSave, onClose, t }) => {
                     imdbRating: data.imdbRating || prev.imdbRating
                 }));
                 if (data.poster) setPreview(data.poster);
-                toast({ message: "Données appliquées !", type: 'success' });
+                toast({ message: t('admin.data_applied'), type: 'success' });
             }
         } catch {
+<<<<<<< fix/ui-translations-and-components
+            toast({ message: t('admin.fetch_error'), type: 'error' });
+=======
             toast({ message: "Erreur lors de la récupération des détails.", type: 'error' });
+>>>>>>> main
         } finally {
             setFetching(false);
         }
@@ -413,7 +416,7 @@ const MovieForm = ({ initial, onSave, onClose, t }) => {
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.35rem' }}>
                         <div style={{ width: '20px', height: '2px', backgroundColor: 'var(--color-accent)' }} />
                         <span style={{ fontSize: '0.65rem', fontWeight: 900, color: 'var(--color-accent)', letterSpacing: '0.2em', textTransform: 'uppercase' }}>
-                            {initial ? 'MODIFICATION' : 'NOUVEL AJOUT'}
+                            {initial ? t('admin.modal_edit_prefix') : t('admin.modal_add_prefix')}
                         </span>
                     </div>
                     <h2 style={{ margin: 0, fontSize: '1.75rem', fontWeight: 950, letterSpacing: '-0.02em' }}>
@@ -446,8 +449,8 @@ const MovieForm = ({ initial, onSave, onClose, t }) => {
                     <div style={{ position: 'relative' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                             <label htmlFor="field-title" style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--color-neutral-400)' }}>
-                                {t('admin.title_field') || 'Titre Principal'}
-                                {fetching && <span style={{ marginLeft: '0.5rem', color: 'var(--color-accent)', fontStyle: 'italic', textTransform: 'none' }}>Hydratation...</span>}
+                                {t('admin.title_field') || t('admin.title_main')}
+                                {fetching && <span style={{ marginLeft: '0.5rem', color: 'var(--color-accent)', fontStyle: 'italic', textTransform: 'none' }}>{t('admin.hydrating')}</span>}
                             </label>
                             <input
                                 id="field-title"
@@ -498,26 +501,26 @@ const MovieForm = ({ initial, onSave, onClose, t }) => {
 
                 {/* Ligne 2: Titre VO & Année */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '1.25rem' }}>
-                    {inputGroup('titleVO', 'Titre Original (VO)', { placeholder: 'Original Title' })}
+                    {inputGroup('titleVO', t('admin.title_vo', 'Titre Original (VO)'), { placeholder: 'Original Title' })}
                     {inputGroup('year', t('admin.year_field'), { placeholder: '2024' })}
                 </div>
 
                 {/* Ligne 3: Genres & Genres VO */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
                     {inputGroup('genre', t('admin.genre_field'), { placeholder: 'Action, Drame' })}
-                    {inputGroup('genreVO', 'Genres (VO)', { placeholder: 'Action, Drama' })}
+                    {inputGroup('genreVO', t('admin.genre_vo', 'Genres (VO)'), { placeholder: 'Action, Drama' })}
                 </div>
 
                 {/* Ligne 4: Catégories & Poster URL */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '1.25rem' }}>
                     {inputGroup('categories', t('admin.categories_field'), { placeholder: 'Blockbuster...' })}
-                    {inputGroup('poster', 'URL de l\'affiche', { placeholder: 'https://...' })}
+                    {inputGroup('poster', t('admin.poster_url', 'URL de l\'affiche'), { placeholder: 'https://...' })}
                 </div>
 
                 {/* Ligne 5: Synopsis FR & VO (Side by Side) */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
-                    {inputGroup('plot', 'Synopsis (FR)', { textarea: true, rows: 2, placeholder: 'Résumé...' })}
-                    {inputGroup('plotVO', 'Synopsis (VO)', { textarea: true, rows: 2, placeholder: 'Summary...' })}
+                    {inputGroup('plot', t('admin.plot_fr', 'Synopsis (FR)'), { textarea: true, rows: 2, placeholder: 'Résumé...' })}
+                    {inputGroup('plotVO', t('admin.plot_vo', 'Synopsis (VO)'), { textarea: true, rows: 2, placeholder: 'Summary...' })}
                 </div>
 
                 {/* Section Upload & Footer simplifiée */}
@@ -548,7 +551,7 @@ const MovieForm = ({ initial, onSave, onClose, t }) => {
                             {t('admin.cancel', 'Annuler')}
                         </Button>
                         <Button type="submit" disabled={saving} size="md" style={{ minWidth: '140px', fontWeight: 800 }}>
-                            {saving ? '...' : (initial ? 'METTRE À JOUR' : 'ENREGISTRER')}
+                            {saving ? '...' : (initial ? t('admin.btn_update', 'METTRE À JOUR') : t('admin.btn_save', 'ENREGISTRER'))}
                         </Button>
                     </div>
                 </div>

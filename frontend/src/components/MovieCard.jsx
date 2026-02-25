@@ -11,7 +11,7 @@ const PLACEHOLDER_POSTER = 'https://via.placeholder.com/300x450/141414/8888aa?te
 
 export default function MovieCard({ movie, isFavorite, onToggleFavorite, variant = 'grid' }) {
     const { isAuthenticated } = useAuthStore();
-    const { i18n } = useTranslation();
+    const { t, i18n } = useTranslation();
     const isEn = i18n.language === 'en';
     const displayTitle = (isEn && movie.titleVO) ? movie.titleVO : movie.title;
     const displayPlot = (isEn && movie.plotVO) ? movie.plotVO : movie.plot;
@@ -135,7 +135,7 @@ export default function MovieCard({ movie, isFavorite, onToggleFavorite, variant
                         variant="ghost"
                         pill
                         onClick={(e) => { e.preventDefault(); onToggleFavorite(movie._id); }}
-                        aria-label={isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+                        aria-label={isFavorite ? t('movie.remove_favorite') : t('movie.add_favorite')}
                         style={{
                             position: 'absolute', bottom: '0.5rem', right: '0.5rem',
                             padding: '0.4rem',

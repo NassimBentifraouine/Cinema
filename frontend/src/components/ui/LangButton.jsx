@@ -23,7 +23,7 @@ export default function LangButton({ lang, current, onClick, title }) {
             onClick={onClick}
             title={title}
             style={{
-                background: 'none',
+                background: active ? 'rgba(255,255,255,0.1)' : 'transparent',
                 border: 'none',
                 cursor: 'pointer',
                 display: 'flex',
@@ -31,21 +31,25 @@ export default function LangButton({ lang, current, onClick, title }) {
                 justifyContent: 'center',
                 opacity: active ? 1 : 0.6,
                 transition: 'all 0.4s cubic-bezier(0.23, 1, 0.32, 1)',
-                padding: '4px',
-                transform: active ? 'scale(1.15)' : 'scale(1)',
-                filter: active ? 'none' : 'grayscale(30%) brightness(0.9)',
+                padding: '6px',
+                borderRadius: '50%',
+                transform: active ? 'scale(1.05)' : 'scale(0.95)',
+                filter: active ? 'none' : 'grayscale(50%) brightness(0.8)',
+                boxShadow: active ? '0 2px 8px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.2)' : 'none',
                 outline: 'none'
             }}
             onMouseEnter={e => {
-                e.currentTarget.style.opacity = 1;
-                e.currentTarget.style.filter = 'none';
-                e.currentTarget.style.transform = 'scale(1.15)';
+                if (!active) {
+                    e.currentTarget.style.opacity = 0.8;
+                    e.currentTarget.style.filter = 'grayscale(20%) brightness(0.9)';
+                    e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
+                }
             }}
             onMouseLeave={e => {
                 if (!active) {
                     e.currentTarget.style.opacity = 0.6;
-                    e.currentTarget.style.filter = 'grayscale(30%) brightness(0.9)';
-                    e.currentTarget.style.transform = 'scale(1)';
+                    e.currentTarget.style.filter = 'grayscale(50%) brightness(0.8)';
+                    e.currentTarget.style.background = 'transparent';
                 }
             }}
         >
