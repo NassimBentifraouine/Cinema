@@ -61,7 +61,7 @@ export default function AdminDashboard() {
         if (!deleteId) return;
         try {
             await moviesApi.delete(deleteId);
-            toast({ message: 'Film supprimÃ©', type: 'success' });
+            toast({ message: 'Film supprimé', type: 'success' });
             setDeleteId(null);
             fetchMovies();
         } catch {
@@ -73,10 +73,10 @@ export default function AdminDashboard() {
         try {
             if (editMovie) {
                 await moviesApi.update(editMovie._id, formData);
-                toast({ message: 'Film mis Ã  jour', type: 'success' });
+                toast({ message: 'Film mis à jour', type: 'success' });
             } else {
                 await moviesApi.create(formData);
-                toast({ message: 'Film crÃ©Ã©', type: 'success' });
+                toast({ message: 'Film créé', type: 'success' });
             }
             closeModal();
             fetchMovies();
@@ -485,7 +485,7 @@ const MovieForm = ({ initial, onSave, onClose, t }) => {
                                         </div>
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.1rem' }}>
                                             <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'white' }}>{s.title}</span>
-                                            <span style={{ fontSize: '0.7rem', color: 'var(--color-neutral-400)' }}>{s.year} â€¢ {s.imdbId}</span>
+                                            <span style={{ fontSize: '0.7rem', color: 'var(--color-neutral-400)' }}>{s.year} • {s.imdbId}</span>
                                         </div>
                                     </div>
                                 ))}
@@ -495,7 +495,7 @@ const MovieForm = ({ initial, onSave, onClose, t }) => {
                     {inputGroup('imdbId', 'ID IMDb', { placeholder: 'tt0000000' })}
                 </div>
 
-                {/* Ligne 2: Titre VO & AnnÃ©e */}
+                {/* Ligne 2: Titre VO & Année */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '1.25rem' }}>
                     {inputGroup('titleVO', t('admin.title_vo', 'Titre Original (VO)'), { placeholder: 'Original Title' })}
                     {inputGroup('year', t('admin.year_field'), { placeholder: '2024' })}
@@ -507,7 +507,7 @@ const MovieForm = ({ initial, onSave, onClose, t }) => {
                     {inputGroup('genreVO', t('admin.genre_vo', 'Genres (VO)'), { placeholder: 'Action, Drama' })}
                 </div>
 
-                {/* Ligne 4: CatÃ©gories & Poster URL */}
+                {/* Ligne 4: Catégories & Poster URL */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '1.25rem' }}>
                     {inputGroup('categories', t('admin.categories_field'), { placeholder: 'Blockbuster...' })}
                     {inputGroup('poster', t('admin.poster_url', 'URL de l\'affiche'), { placeholder: 'https://...' })}
@@ -515,11 +515,11 @@ const MovieForm = ({ initial, onSave, onClose, t }) => {
 
                 {/* Ligne 5: Synopsis FR & VO (Side by Side) */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
-                    {inputGroup('plot', t('admin.plot_fr', 'Synopsis (FR)'), { textarea: true, rows: 2, placeholder: 'RÃ©sumÃ©...' })}
+                    {inputGroup('plot', t('admin.plot_fr', 'Synopsis (FR)'), { textarea: true, rows: 2, placeholder: 'Résumé...' })}
                     {inputGroup('plotVO', t('admin.plot_vo', 'Synopsis (VO)'), { textarea: true, rows: 2, placeholder: 'Summary...' })}
                 </div>
 
-                {/* Section Upload & Footer simplifiÃ©e */}
+                {/* Section Upload & Footer simplifiée */}
                 <div style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -537,7 +537,7 @@ const MovieForm = ({ initial, onSave, onClose, t }) => {
                             )}
                         </div>
                         <Button type="button" onClick={() => fileRef.current?.click()} size="sm" variant="outline" icon={Upload}>
-                            {t('admin.upload_poster', 'TransfÃ©rer')}
+                            {t('admin.upload_poster', 'Transférer')}
                         </Button>
                         <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleFile} />
                     </div>
@@ -547,7 +547,7 @@ const MovieForm = ({ initial, onSave, onClose, t }) => {
                             {t('admin.cancel', 'Annuler')}
                         </Button>
                         <Button type="submit" disabled={saving} size="md" style={{ minWidth: '140px', fontWeight: 800 }}>
-                            {saving ? '...' : (initial ? t('admin.btn_update', 'METTRE Ã€ JOUR') : t('admin.btn_save', 'ENREGISTRER'))}
+                            {saving ? '...' : (initial ? t('admin.btn_update', 'METTRE À JOUR') : t('admin.btn_save', 'ENREGISTRER'))}
                         </Button>
                     </div>
                 </div>
