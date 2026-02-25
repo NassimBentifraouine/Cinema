@@ -1,22 +1,22 @@
 services:
   mongo:
     image: mongo:7
-    container_name: cinecat_mongo
+    container_name: cinema_mongo
     restart: unless-stopped
     volumes:
       - mongo_data:/data/db
     ports:
       - '27017:27017'
     networks:
-      - cinecat_net
+      - cinema_net
 
   backend:
     build: ./backend
-    container_name: cinecat_backend
+    container_name: cinema_backend
     restart: unless-stopped
     env_file: ./backend/.env
     environment:
-      MONGO_URI: mongodb://mongo:27017/cinecat
+      MONGO_URI: mongodb://mongo:27017/cinema
     ports:
       - '3001:3001'
     depends_on:
@@ -24,23 +24,23 @@ services:
     volumes:
       - ./backend/uploads:/app/uploads
     networks:
-      - cinecat_net
+      - cinema_net
 
   frontend:
     build: ./frontend
-    container_name: cinecat_frontend
+    container_name: cinema_frontend
     restart: unless-stopped
     ports:
       - '5173:80'
     depends_on:
       - backend
     networks:
-      - cinecat_net
+      - cinema_net
 
 volumes:
   mongo_data:
 
 
 networks:
-  cinecat_net:
+  cinema_net:
     driver: bridge

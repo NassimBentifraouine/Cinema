@@ -499,7 +499,7 @@ const MovieForm = ({ initial, onSave, onClose, t }) => {
                 {/* Ligne 2: Titre VO & Année */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '1.25rem' }}>
                     {inputGroup('titleVO', t('admin.title_vo', 'Titre Original (VO)'), { placeholder: 'Original Title' })}
-                    {inputGroup('year', t('admin.year_field'), { placeholder: '2024' })}
+                    {inputGroup('year', t('admin.year_field'), { placeholder: '2026' })}
                 </div>
 
                 {/* Ligne 3: Genres & Genres VO */}

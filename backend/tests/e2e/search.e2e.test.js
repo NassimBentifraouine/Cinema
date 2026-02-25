@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const app = require('../../src/server');
 const Movie = require('../../src/models/Movie.model');
 
-const TEST_DB = 'mongodb://localhost:27017/cinecat_search_test';
+const TEST_DB = 'mongodb://localhost:27017/cinema_search_test';
 
 beforeAll(async () => {
     await mongoose.connect(TEST_DB);
