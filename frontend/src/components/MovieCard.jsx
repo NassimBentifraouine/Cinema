@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Star, Heart } from 'lucide-react';
+import { Star, Heart, User } from 'lucide-react';
 import { useAuthStore } from '../store/auth.store';
 import { useTranslation } from 'react-i18next';
 
@@ -32,12 +32,20 @@ export default function MovieCard({ movie, isFavorite, onToggleFavorite, variant
                         <Link to={`/movie/${movie.imdbId || movie._id}`}>
                             <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: 'white' }}>{displayTitle}</h3>
                         </Link>
-                        {movie.imdbRating > 0 && (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', color: 'var(--color-gold)', fontWeight: 800, fontSize: '0.85rem' }}>
-                                <Star size={12} fill="currentColor" />
-                                {movie.imdbRating.toFixed(1)}
-                            </div>
-                        )}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                            {movie.imdbRating > 0 && (
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', color: 'var(--color-gold)', fontWeight: 800, fontSize: '0.85rem' }}>
+                                    <Star size={12} fill="currentColor" />
+                                    {movie.imdbRating.toFixed(1)}
+                                </div>
+                            )}
+                            {movie.communityRating > 0 && (
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', color: 'var(--color-accent)', fontWeight: 800, fontSize: '0.85rem' }}>
+                                    <User size={12} fill="currentColor" />
+                                    {movie.communityRating.toFixed(1)}
+                                </div>
+                            )}
+                        </div>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem', color: 'var(--color-neutral-400)', marginBottom: '0.75rem' }}>
                         <span>{movie.year}</span>
@@ -93,19 +101,33 @@ export default function MovieCard({ movie, isFavorite, onToggleFavorite, variant
                     />
                 </Link>
 
-                {/* Top Right Rating Badge */}
-                {movie.imdbRating > 0 && (
-                    <GlassPanel
-                        padding="0.2rem 0.5rem"
-                        borderRadius="4px"
-                        style={{ position: 'absolute', top: '0.5rem', right: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}
-                    >
-                        <Star size={10} fill="var(--color-gold)" color="var(--color-gold)" />
-                        <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'white' }}>
-                            {movie.imdbRating.toFixed(1)}
-                        </span>
-                    </GlassPanel>
-                )}
+                {/* Top Right Rating Badge Container */}
+                <div style={{ position: 'absolute', top: '0.5rem', right: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.4rem', alignItems: 'flex-end' }}>
+                    {movie.imdbRating > 0 && (
+                        <GlassPanel
+                            padding="0.2rem 0.5rem"
+                            borderRadius="4px"
+                            style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', border: '1px solid rgba(255,255,255,0.1)' }}
+                        >
+                            <Star size={10} fill="var(--color-gold)" color="var(--color-gold)" />
+                            <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'white' }}>
+                                {movie.imdbRating.toFixed(1)}
+                            </span>
+                        </GlassPanel>
+                    )}
+                    {movie.communityRating > 0 && (
+                        <GlassPanel
+                            padding="0.2rem 0.5rem"
+                            borderRadius="4px"
+                            style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', border: '1px solid rgba(229, 9, 20, 0.2)' }}
+                        >
+                            <User size={10} fill="var(--color-accent)" color="var(--color-accent)" />
+                            <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'white' }}>
+                                {Number(movie.communityRating).toFixed(1)}
+                            </span>
+                        </GlassPanel>
+                    )}
+                </div>
 
                 {/* Favorite button (if authenticated) */}
                 {isAuthenticated && onToggleFavorite && (

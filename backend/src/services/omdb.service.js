@@ -108,6 +108,7 @@ const getMovieById = async (query) => {
         imdbRating: rating,
         imdbVotes: data.imdbVotes,
         cachedAt: new Date(),
+        isExplicitlyAdded: true,
     };
 
     // Upsert in DB cache
