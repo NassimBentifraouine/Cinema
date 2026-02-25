@@ -6,7 +6,7 @@ import { userApi } from '../lib/api';
 import { useAuthStore } from '../store/auth.store';
 import StarRating from '../components/StarRating';
 
-// UI Components
+
 import GlassPanel from '../components/ui/GlassPanel';
 
 const TABS = [

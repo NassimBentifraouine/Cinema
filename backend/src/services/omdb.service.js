@@ -7,7 +7,7 @@ const translateText = async (text, targetLang = 'fr') => {
         const res = await axios.get(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`);
         return res.data[0].map(s => s[0]).join('');
     } catch (e) {
-        console.warn('Google Translate custom API failed:', e.message);
+        // Fallback or ignore
         return text;
     }
 };
@@ -85,7 +85,7 @@ const getMovieById = async (query) => {
         }
         title = await translateText(title, 'fr');
     } catch (err) {
-        console.error('Translation error:', err.message);
+        // Silently handle error
     }
 
     const rating = parseFloat(data.imdbRating) || 0;
@@ -155,7 +155,7 @@ const searchMovies = async (query, page = 1) => {
             try {
                 title = await translateText(title, 'fr');
             } catch (err) {
-                console.error('Translation error on search:', err.message);
+                // Silently handle translation error
             }
 
             const newMovie = await Movie.create({

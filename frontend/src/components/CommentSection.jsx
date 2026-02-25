@@ -20,7 +20,7 @@ export default function CommentSection({ movieId }) {
             const res = await moviesApi.getComments(movieId);
             setComments(res.data);
         } catch {
-            console.error('Failed to fetch comments');
+            // Silently handle error
         } finally {
             setLoading(false);
         }

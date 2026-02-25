@@ -10,7 +10,7 @@ import { moviesApi, userApi } from '../lib/api';
 import { useAuthStore } from '../store/auth.store';
 import { Film } from 'lucide-react';
 
-// UI Components
+
 import Button from '../components/ui/Button';
 
 export default function CataloguePage() {
@@ -51,7 +51,7 @@ export default function CataloguePage() {
         setSearchParams(params, { replace: true });
     }, [search, genre, minRating, sort, page, setSearchParams]);
 
-    // Fetch movies
+
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setLoading(true);
