@@ -16,7 +16,7 @@ const RULES = [
     { key: 'upper', label: 'Uppercase', test: v => /[A-Z]/.test(v) },
     { key: 'lower', label: 'Lowercase', test: v => /[a-z]/.test(v) },
     { key: 'digit', label: 'Number', test: v => /[0-9]/.test(v) },
-    { key: 'special', label: 'Special char', test: v => /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(v) },
+    { key: 'special', label: 'Special char', test: v => /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(v) },
 ];
 
 export default function RegisterPage() {

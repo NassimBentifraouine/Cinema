@@ -19,8 +19,8 @@ export default function CommentSection({ movieId }) {
         try {
             const res = await moviesApi.getComments(movieId);
             setComments(res.data);
-        } catch (error) {
-            console.error('Failed to fetch comments', error);
+        } catch {
+            console.error('Failed to fetch comments');
         } finally {
             setLoading(false);
         }
@@ -43,7 +43,7 @@ export default function CommentSection({ movieId }) {
             setNewComment('');
             fetchComments();
             toast({ message: 'Commentaire ajouté !', type: 'success' });
-        } catch (error) {
+        } catch {
             toast({ message: t('errors.server_error'), type: 'error' });
         } finally {
             setSubmitting(false);
@@ -57,7 +57,7 @@ export default function CommentSection({ movieId }) {
             await moviesApi.deleteComment(commentId);
             setComments(comments.filter(c => c._id !== commentId));
             toast({ message: t('movie.delete_comment') + ' OK', type: 'success' });
-        } catch (error) {
+        } catch {
             toast({ message: t('errors.server_error'), type: 'error' });
         }
     };
