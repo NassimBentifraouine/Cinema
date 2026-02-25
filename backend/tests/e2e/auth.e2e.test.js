@@ -2,7 +2,7 @@ const request = require('supertest');
 const mongoose = require('mongoose');
 const app = require('../../src/server');
 
-const TEST_DB = 'mongodb://localhost:27017/cinecat_test';
+const TEST_DB = 'mongodb://localhost:27017/cinema_test';
 
 beforeAll(async () => {
     await mongoose.connect(TEST_DB);

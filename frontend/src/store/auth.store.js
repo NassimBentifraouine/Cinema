@@ -19,7 +19,7 @@ export const useAuthStore = create(
             isAdmin: () => get().user?.role === 'ADMIN',
         }),
         {
-            name: 'cinecat_auth',
+            name: 'cinema_auth',
             partialize: (state) => ({ user: state.user, token: state.token, isAuthenticated: state.isAuthenticated }),
         }
     )

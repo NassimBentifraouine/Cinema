@@ -3,7 +3,7 @@ import { initReactI18next } from 'react-i18next';
 import fr from './fr.json';
 import en from './en.json';
 
-const savedLang = localStorage.getItem('cinecat_lang') || 'fr';
+const savedLang = localStorage.getItem('cinema_lang') || 'fr';
 
 i18n.use(initReactI18next).init({
     resources: {
