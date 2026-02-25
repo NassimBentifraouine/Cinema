@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { User, LogOut, Settings } from 'lucide-react';
 import { useAuthStore } from '../store/auth.store';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 
 // UI Components
 import Logo from './ui/Logo';
@@ -15,6 +15,7 @@ export default function Navbar() {
     const { t, i18n } = useTranslation();
     const { isAuthenticated, user, logout, isAdmin } = useAuthStore();
     const navigate = useNavigate();
+    const location = useLocation();
     const [scrolled, setScrolled] = useState(false);
     const [userMenuOpen, setUserMenuOpen] = useState(false);
 
@@ -40,18 +41,18 @@ export default function Navbar() {
         width: '92%',
         maxWidth: '1400px',
         zIndex: 100,
-        background: scrolled ? 'rgba(15, 15, 15, 0.85)' : 'rgba(15, 15, 15, 0.4)',
-        backdropFilter: 'blur(20px) saturate(180%)',
+        background: scrolled ? 'linear-gradient(180deg, rgba(15,15,15,0.7) 0%, rgba(5,5,5,0.85) 100%)' : 'linear-gradient(180deg, rgba(15,15,15,0.2) 0%, rgba(5,5,5,0.5) 100%)',
+        backdropFilter: 'blur(24px) saturate(200%)',
         transition: 'all 0.5s cubic-bezier(0.19, 1, 0.22, 1)',
         padding: '0 1.5rem',
-        height: scrolled ? '64px' : '82px',
+        height: scrolled ? '60px' : '76px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        marginTop: scrolled ? '12px' : '24px',
+        marginTop: scrolled ? '16px' : '28px',
         borderRadius: '100px',
-        border: '1px solid rgba(255, 255, 255, 0.12)',
-        boxShadow: scrolled ? '0 30px 60px rgba(0,0,0,0.5)' : '0 10px 40px rgba(0,0,0,0.2)'
+        border: '1px solid rgba(255, 255, 255, 0.08)',
+        boxShadow: scrolled ? 'inset 0 1px 0 rgba(255,255,255,0.1), 0 30px 60px rgba(0,0,0,0.6)' : 'inset 0 1px 0 rgba(255,255,255,0.05), 0 10px 40px rgba(0,0,0,0.3)'
     };
 
     return (
@@ -61,9 +62,9 @@ export default function Navbar() {
                 <Logo height={scrolled ? '28px' : '36px'} />
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <NavLink to="/">{t('nav.catalog')}</NavLink>
+                    <NavLink to="/" active={location.pathname === '/'}>{t('nav.catalog')}</NavLink>
                     {isAdmin() && (
-                        <NavLink to="/admin" color="var(--color-accent)">{t('nav.admin')}</NavLink>
+                        <NavLink to="/admin" color="var(--color-accent)" active={location.pathname.startsWith('/admin')}>{t('nav.admin')}</NavLink>
                     )}
                 </div>
             </div>
@@ -73,9 +74,10 @@ export default function Navbar() {
 
                 {/* Language Toggles */}
                 <div style={{
-                    display: 'flex', gap: '0.4rem', alignItems: 'center',
-                    background: 'rgba(255,255,255,0.03)', padding: '0.2rem 0.6rem',
-                    borderRadius: '20px', border: '1px solid rgba(255,255,255,0.06)'
+                    display: 'flex', gap: '0.2rem', alignItems: 'center',
+                    background: 'rgba(0,0,0,0.4)', padding: '0.3rem',
+                    borderRadius: 'var(--radius-pill)', border: '1px solid rgba(255,255,255,0.06)',
+                    boxShadow: 'inset 0 2px 5px rgba(0,0,0,0.5)'
                 }}>
                     <LangButton lang="fr" current={i18n.language} onClick={() => i18n.changeLanguage('fr')} title="Français" />
                     <LangButton lang="en" current={i18n.language} onClick={() => i18n.changeLanguage('en')} title="English" />
@@ -83,16 +85,34 @@ export default function Navbar() {
 
                 {isAuthenticated ? (
                     <div style={{ position: 'relative' }}>
-                        <Button
-                            pill
-                            variant="primary"
-                            size="sm"
+                        <button
                             onClick={() => setUserMenuOpen(!userMenuOpen)}
-                            style={{ padding: '0.4rem 0.6rem 0.4rem 1.25rem', display: 'flex', alignItems: 'center', gap: '0.75rem', background: 'white', color: 'black' }}
+                            style={{
+                                display: 'flex', alignItems: 'center', gap: '0.75rem',
+                                padding: '0.4rem 0.4rem 0.4rem 1.25rem',
+                                background: 'linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%)',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '100px',
+                                color: 'white',
+                                cursor: 'pointer',
+                                transition: 'all 0.3s cubic-bezier(0.16,1,0.3,1)',
+                                boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), 0 4px 15px rgba(0,0,0,0.3)',
+                                outline: 'none'
+                            }}
+                            onMouseEnter={e => {
+                                e.currentTarget.style.background = 'linear-gradient(180deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.05) 100%)';
+                                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)';
+                                e.currentTarget.style.transform = 'translateY(-1px)';
+                            }}
+                            onMouseLeave={e => {
+                                e.currentTarget.style.background = 'linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%)';
+                                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
+                                e.currentTarget.style.transform = 'translateY(0)';
+                            }}
                         >
-                            <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>{t('nav.dashboard')}</span>
+                            <span style={{ fontWeight: 700, fontSize: '0.85rem', letterSpacing: '0.05em' }}>{t('nav.dashboard')}</span>
                             <UserAvatar />
-                        </Button>
+                        </button>
 
                         {userMenuOpen && (
                             <UserMenu
@@ -106,7 +126,7 @@ export default function Navbar() {
                     </div>
                 ) : (
                     <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                        <NavLink to="/login">{t('nav.login')}</NavLink>
+                        <NavLink to="/login" active={location.pathname === '/login'}>{t('nav.login')}</NavLink>
                         <Button to="/register" pill size="sm">
                             {t('nav.register')}
                         </Button>

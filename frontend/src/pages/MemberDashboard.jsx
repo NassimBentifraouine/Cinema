@@ -16,7 +16,7 @@ const TABS = [
 ];
 
 export default function MemberDashboard() {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const { user } = useAuthStore();
     const [tab, setTab] = useState('favorites');
     const [data, setData] = useState({ favorites: [], ratings: [], history: [] });
@@ -136,7 +136,7 @@ export default function MemberDashboard() {
                 <div className="animate-fade-in" style={{ animationDuration: '0.4s' }}>
                     {tab === 'favorites' && <FavoritesGrid favorites={data.favorites} t={t} />}
                     {tab === 'ratings' && <RatingsList ratings={data.ratings} t={t} />}
-                    {tab === 'history' && <HistoryList history={data.history} t={t} />}
+                    {tab === 'history' && <HistoryList history={data.history} t={t} i18n={i18n} />}
                 </div>
             )}
         </main>
@@ -185,7 +185,7 @@ function RatingsList({ ratings, t }) {
     );
 }
 
-function HistoryList({ history, t }) {
+function HistoryList({ history, t, i18n }) {
     if (!history.length) return <EmptyState icon={<Clock size={40} />} msg={t('dashboard.no_history')} />;
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
@@ -200,7 +200,7 @@ function HistoryList({ history, t }) {
                         </div>
                         <span style={{ flex: 1, fontSize: '0.95rem', fontWeight: 600, color: 'var(--color-neutral-200)' }}>{h.movie?.title || '—'}</span>
                         <span style={{ fontSize: '0.8rem', color: 'var(--color-neutral-400)', fontWeight: 500 }}>
-                            {h.visitedAt ? new Date(h.visitedAt).toLocaleDateString('fr-FR') : ''}
+                            {h.visitedAt ? new Date(h.visitedAt).toLocaleDateString(i18n?.language === 'en' ? 'en-US' : 'fr-FR') : ''}
                         </span>
                     </div>
                 </Link>
