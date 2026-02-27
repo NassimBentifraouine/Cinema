@@ -17,24 +17,11 @@ export default function Logo({ height = '32px', className = '' }) {
             onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.05)'}
             onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
         >
-            <svg viewBox="0 0 800 400" style={{ height: '100%', width: 'auto' }}>
-                <defs>
-                    <filter id="netflix-shadow" x="-20%" y="-20%" width="140%" height="140%">
-                        <feDropShadow dx="0" dy="8" stdDeviation="6" floodColor="#000000" floodOpacity="0.8" />
-                    </filter>
-                </defs>
-                <path id="curve" d="M 50 280 Q 400 330 750 280" fill="transparent" />
-                <text
-                    fontFamily="'Arial Black', Impact, 'Helvetica Neue', sans-serif"
-                    fontSize="160"
-                    fontWeight="900"
-                    letterSpacing="15"
-                    fill="#FFFFFF"
-                    textAnchor="middle"
-                    filter="url(#netflix-shadow)"
-                >
-                    <textPath href="#curve" startOffset="50%">CINÉMA</textPath>
-                </text>
+            <svg viewBox="0 0 438.65 310.94" style={{ height: '100%', width: 'auto' }}>
+                <g fill="#FFFFFF">
+                    <path d="M2.26,244.46l-1.92,44.39c-.48,11.22,12.98,22.82,23.06,21.42,33.4-4.62,5.26-52.67,27.84-75.56l155.31-.3c36.82-.07,61.46,28.68,71.05,62.03,2.4,8.35,16.71,16.26,23.79,14.15,37.81-11.26-3.01-73.1-24.25-92.76,46.2-30.43,66.9-82.68,51.99-133.97C315.84,38.19,271.08-.25,218.37,0L63.42.75C21.6.95-5.04,45.08.8,80.36c6.66,40.23,39.91,59.92,80.74,59.69l142.98-.81c11.62-.07,21.57-11.61,21.16-22.36-.28-7.47-11.7-18.86-20.71-18.87l-153.76-.17c-17.89-.02-30.78-14.35-29.73-31.01.8-12.73,14.32-26.75,29.63-26.69l147.55.58c43.16.17,74.82,38.98,73.62,76.72-1.36,42.85-34.39,75.34-78.45,75.39l-152.59.17c-27.34.03-57.65,20.54-58.99,51.46ZM435.64,185.84c4.01-53.3,3.66-89.84.95-144.05-32.28,13.94-53.35,26.15-80.48,42.75l.42,59.65,79.1,41.65Z" />
+                    <path d="M421.97,178.64l-60.09-31.64c-3.29-1.73-5.35-5.13-5.38-8.84l-.34-47.92c-.03-3.54,1.82-6.84,4.85-8.68,20.95-12.74,38.76-22.96,62.01-33.7,6.5-3,13.97,1.56,14.28,8.71,1.82,41.32,1.97,73.23-.58,113.81-.46,7.28-8.29,11.67-14.75,8.27Z" />
+                </g>
             </svg>
         </Link>
     );

@@ -87,9 +87,10 @@ export default function CataloguePage() {
 
             <div style={{
                 display: 'flex',
-                gap: '2rem',
-                padding: '2rem 4%',
-                maxWidth: '1800px',
+                gap: '2.5rem',
+                padding: '3rem 2.5rem',
+                width: '92%',
+                maxWidth: '1400px',
                 margin: '0 auto',
                 alignItems: 'flex-start'
             }}>
