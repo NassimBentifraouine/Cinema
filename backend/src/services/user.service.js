@@ -75,4 +75,49 @@ const deleteRating = async (userId, movieId) => {
     return Rating.findOneAndDelete({ user: userId, movie: internalId });
 };
 
-module.exports = { addFavorite, removeFavorite, getFavorites, rateMovie, getRatings, deleteRating, addHistory, getHistory };
+const updateProfile = async (userId, data) => {
+    const { email, currentPassword, newPassword } = data;
+    const user = await User.findById(userId).select('+password');
+    if (!user) throw new Error('User not found');
+
+    // 1. Check current password if updating password OR email
+    if (currentPassword) {
+        const isMatch = await user.comparePassword(currentPassword);
+        if (!isMatch) {
+            const err = new Error('Mot de passe actuel incorrect');
+            err.statusCode = 400;
+            throw err;
+        }
+    } else if (newPassword || (email && email !== user.email)) {
+        // Require password for sensitive changes
+        const err = new Error('Mot de passe actuel requis pour modifier ces informations');
+        err.statusCode = 400;
+        throw err;
+    }
+
+    // 2. Handle email update
+    if (email && email !== user.email) {
+        const existing = await User.findOne({ email });
+        if (existing) {
+            const err = new Error('Cet email est déjà utilisé');
+            err.statusCode = 400;
+            throw err;
+        }
+        user.email = email;
+    }
+
+    // 3. Handle password update
+    if (newPassword) {
+        if (newPassword.length < 8) {
+            const err = new Error('Le nouveau mot de passe doit faire au moins 8 caractères');
+            err.statusCode = 400;
+            throw err;
+        }
+        user.password = newPassword;
+    }
+
+    await user.save();
+    return User.findById(userId); // Return without password
+};
+
+module.exports = { addFavorite, removeFavorite, getFavorites, rateMovie, getRatings, deleteRating, addHistory, getHistory, updateProfile };

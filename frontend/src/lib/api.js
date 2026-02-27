@@ -57,6 +57,7 @@ export const userApi = {
     deleteRating: (movieId) => api.delete(`/users/ratings/${movieId}`),
     getHistory: () => api.get('/users/history'),
     addHistory: (movieId) => api.post(`/users/history/${movieId}`),
+    updateProfile: (data) => api.put('/users/profile', data),
 };
 
 

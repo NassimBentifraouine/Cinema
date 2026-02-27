@@ -95,6 +95,7 @@
         "favorites": "My Favorites",
         "ratings": "My Ratings",
         "history": "My History",
+        "account": "Account",
         "no_favorites": "No favorites yet",
         "no_ratings": "You haven't rated any movies yet",
         "no_history": "Your history is empty",
@@ -167,5 +168,17 @@
         "passwords_match": "Passwords must match",
         "login_failed": "Incorrect email or password",
         "server_error": "Server error, please try again"
+    },
+    "profile": {
+        "title": "My Account",
+        "subtitle": "Manage your account information and security.",
+        "email_label": "Email Address",
+        "security_section": "Security & Password",
+        "current_password_label": "Current Password",
+        "new_password_label": "New Password",
+        "confirm_password_label": "Confirm New Password",
+        "save_button": "UPDATE PROFILE",
+        "update_success": "Profile updated successfully!",
+        "password_mismatch": "New passwords do not match"
     }
 }

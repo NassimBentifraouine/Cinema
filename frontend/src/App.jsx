@@ -10,6 +10,7 @@ const LoginPage = lazy(() => import('./pages/LoginPage'));
 const RegisterPage = lazy(() => import('./pages/RegisterPage'));
 const MemberDashboard = lazy(() => import('./pages/MemberDashboard'));
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
+const ProfilePage = lazy(() => import('./pages/ProfilePage'));
 
 const LoadingFallback = () => (
   <div className="flex items-center justify-center min-h-screen" style={{ background: 'var(--color-bg-dark)' }}>
@@ -41,6 +42,11 @@ export default function App() {
               <Route path="/admin" element={
                 <ProtectedRoute adminOnly>
                   <AdminDashboard />
+                </ProtectedRoute>
+              } />
+              <Route path="/profile" element={
+                <ProtectedRoute>
+                  <ProfilePage />
                 </ProtectedRoute>
               } />
               <Route path="*" element={<Navigate to="/" replace />} />
