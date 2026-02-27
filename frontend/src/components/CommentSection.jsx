@@ -20,7 +20,6 @@ export default function CommentSection({ movieId }) {
             const res = await moviesApi.getComments(movieId);
             setComments(res.data);
         } catch {
-            // Silently handle error
         } finally {
             setLoading(false);
         }
@@ -69,7 +68,6 @@ export default function CommentSection({ movieId }) {
                 {t('movie.comments')} <span style={{ color: 'var(--color-neutral-400)', fontSize: '1rem', fontWeight: 500 }}>({comments.length})</span>
             </h3>
 
-            {/* Comment Form */}
             {isAuthenticated ? (
                 <form onSubmit={handleSumbit} style={{ marginBottom: '2rem', display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
                     <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--color-accent)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', flexShrink: 0 }}>
@@ -110,7 +108,6 @@ export default function CommentSection({ movieId }) {
                 </div>
             )}
 
-            {/* Comments List */}
             {loading ? (
                 <div className="skeleton" style={{ height: '100px', borderRadius: 'var(--radius-md)' }} />
             ) : comments.length === 0 ? (

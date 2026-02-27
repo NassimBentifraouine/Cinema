@@ -21,12 +21,11 @@ export default function CataloguePage() {
     const [pages, setPages] = useState(1);
     const [loading, setLoading] = useState(false);
     const [favorites, setFavorites] = useState([]);
-    const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
+    const [viewMode, setViewMode] = useState('grid');
     const [searchParams, setSearchParams] = useSearchParams();
 
     const { search, genre, minRating, sort, page, limit, setSearch, setGenre, setMinRating, setSort, setPage } = useFiltersStore();
 
-    // Sync URL ↔ store on mount
     useEffect(() => {
         const s = searchParams.get('search') || '';
         const g = searchParams.get('genre') || '';
@@ -40,7 +39,6 @@ export default function CataloguePage() {
         if (p > 1) setPage(p);
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-    // Sync store → URL
     useEffect(() => {
         const params = {};
         if (search) params.search = search;
@@ -65,7 +63,6 @@ export default function CataloguePage() {
             .finally(() => setLoading(false));
     }, [search, genre, minRating, sort, page, limit]);
 
-    // Fetch favorites if authenticated
     useEffect(() => {
         if (!isAuthenticated) return;
         userApi.getFavorites().then(r => {
@@ -88,7 +85,6 @@ export default function CataloguePage() {
         <main style={{ paddingBottom: '4rem' }}>
             <HeroBanner />
 
-            {/* Main Layout Container (Sidebar + Grid) */}
             <div style={{
                 display: 'flex',
                 gap: '2rem',
@@ -98,20 +94,17 @@ export default function CataloguePage() {
                 alignItems: 'flex-start'
             }}>
 
-                {/* Left Sidebar (Filters) */}
                 <aside style={{
-                    flex: '0 0 280px', /* Fixed width */
+                    flex: '0 0 280px',
                     position: 'sticky',
-                    top: '90px' /* Stick below navbar */
+                    top: '90px'
                 }}>
                     <FilterPanel />
 
 
                 </aside>
 
-                {/* Right Content (Movie Grid) */}
                 <section style={{ flex: '1', minWidth: 0 }}>
-                    {/* Results Header */}
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2.5rem', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '1.5rem' }}>
                         <div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
@@ -125,30 +118,8 @@ export default function CataloguePage() {
                             </h2>
                         </div>
 
-                        {/* Tiny layout toggle buttons */}
-                        <div style={{ display: 'flex', gap: '0.75rem' }}>
-                            <Button
-                                variant={viewMode === 'grid' ? 'primary' : 'outline'}
-                                size="sm"
-                                padding="0.5rem"
-                                onClick={() => setViewMode('grid')}
-                                style={{ width: '48px', height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                            >
-                                <svg width="28" height="28" viewBox="0 0 14 14" fill="currentColor"><rect width="6" height="6" /><rect width="6" height="6" x="8" /><rect width="6" height="6" y="8" /><rect width="6" height="6" x="8" y="8" /></svg>
-                            </Button>
-                            <Button
-                                variant={viewMode === 'list' ? 'primary' : 'outline'}
-                                size="sm"
-                                padding="0.5rem"
-                                onClick={() => setViewMode('list')}
-                                style={{ width: '48px', height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                            >
-                                <svg width="28" height="28" viewBox="0 0 14 14" fill="currentColor"><rect width="14" height="4" /><rect width="14" height="4" y="5" /><rect width="14" height="4" y="10" /></svg>
-                            </Button>
-                        </div>
                     </div>
 
-                    {/* Grid */}
                     {loading && (
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '1.5rem' }}>
                             {Array.from({ length: 12 }).map((_, i) => (
@@ -187,7 +158,6 @@ export default function CataloguePage() {
                                 ))}
                             </div>
 
-                            {/* Pagination */}
                             {pages > 1 && (
                                 <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginTop: '2rem' }}>
                                     <Button

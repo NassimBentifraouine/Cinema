@@ -38,7 +38,6 @@ export default function MemberDashboard() {
 
     return (
         <main style={{ width: '92%', maxWidth: '1400px', margin: '0 auto', padding: '160px 0 4rem', position: 'relative' }} className="animate-fade-in">
-            {/* Page Header */}
             <header style={{ marginBottom: '3.5rem', textAlign: 'left' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.5rem' }}>
                     <div style={{ width: '32px', height: '2px', backgroundColor: 'var(--color-accent)' }} />
@@ -62,7 +61,6 @@ export default function MemberDashboard() {
                 </p>
             </header>
 
-            {/* Tabs Navigation */}
             <div style={{
                 display: 'flex',
                 gap: '2.5rem',
@@ -108,7 +106,6 @@ export default function MemberDashboard() {
                             {t(`dashboard.${key}`)}
                         </span>
 
-                        {/* Active Underline Indicator */}
                         {tab === key && (
                             <div style={{
                                 position: 'absolute',
@@ -125,7 +122,6 @@ export default function MemberDashboard() {
                 ))}
             </div>
 
-            {/* Content */}
             {loading ? (
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: '1rem' }}>
                     {Array.from({ length: 6 }).map((_, i) => (

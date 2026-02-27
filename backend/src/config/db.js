@@ -2,13 +2,18 @@ const mongoose = require('mongoose');
 
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(process.env.MONGO_URI);
-    console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
+    const options = {
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+    };
+    const conn = await mongoose.connect(process.env.MONGO_URI, options);
+    console.log(`✅ MongoDB connecté : ${conn.connection.host}`);
   } catch (error) {
-    console.error(`⚠️  MongoDB unavailable: ${error.message}`);
-    console.error('   → Server will start but DB operations will fail.');
-    console.error('   → Start MongoDB or run: docker-compose up mongo');
-    // Don't exit — allow server to start without DB
+    console.error(`⚠️  Échec de la connexion MongoDB Atlas :`);
+    console.error(`   Message: ${error.message}`);
+    console.error(`   Code: ${error.code}`);
+    console.error('   → Vérifiez que votre IP est autorisée dans le dashboard Atlas.');
+    console.error('   → Vérifiez votre connexion DNS.');
   }
 };
 

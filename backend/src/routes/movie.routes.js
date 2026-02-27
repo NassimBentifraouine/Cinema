@@ -7,7 +7,6 @@ const authMiddleware = require('../middleware/auth.middleware');
 const requireRole = require('../middleware/role.middleware');
 const { movieValidator, validate } = require('../validators/movie.validator');
 
-// Multer config for image upload
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, path.join(__dirname, '../../uploads'));
@@ -28,21 +27,17 @@ const fileFilter = (req, file, cb) => {
 
 const upload = multer({ storage, fileFilter, limits: { fileSize: 5 * 1024 * 1024 } });
 
-// Public routes
 router.get('/', getMovies);
 
-// Admin / OMDb routes (Must be before /:id)
 router.get('/omdb/search', authMiddleware, requireRole('ADMIN'), getOmdbPreview);
 router.get('/omdb/suggestions', authMiddleware, requireRole('ADMIN'), getOmdbSuggestions);
 
 router.get('/:id', getMovie);
 router.get('/:id/comments', getComments);
 
-// Authenticated routes
 router.post('/:id/comments', authMiddleware, addComment);
 router.delete('/comments/:commentId', authMiddleware, deleteComment);
 
-// Admin routes
 router.post('/', authMiddleware, requireRole('ADMIN'), upload.single('poster'), createMovie);
 router.put('/:id', authMiddleware, requireRole('ADMIN'), upload.single('poster'), updateMovie);
 router.delete('/:id', authMiddleware, requireRole('ADMIN'), deleteMovie);

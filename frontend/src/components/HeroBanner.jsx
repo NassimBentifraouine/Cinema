@@ -39,7 +39,6 @@ export default function HeroBanner() {
     const displayTitle = (isEn && featured.titleVO) ? featured.titleVO : featured.title;
     const displayPlot = (isEn && featured.plotVO) ? featured.plotVO : featured.plot;
 
-    // Formatting title for the mockup look (first word bold italic white, rest bold italic red)
     const titleWords = displayTitle ? displayTitle.split(' ') : ['THE', 'MOVIE'];
     const firstWord = titleWords[0];
     const restOfTitle = titleWords.slice(1).join(' ');
@@ -53,7 +52,6 @@ export default function HeroBanner() {
             }}
             aria-label={`Film en vedette: ${displayTitle}`}
         >
-            {/* Full Bleed Background image */}
             <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}>
                 <img
                     src={posterSrc}
@@ -66,7 +64,6 @@ export default function HeroBanner() {
                 />
             </div>
 
-            {/* Asymmetric Gradients for text readability (CineView Style) */}
             <div style={{
                 position: 'absolute', inset: 0,
                 background: 'linear-gradient(to right, rgba(18, 12, 12, 1) 10%, rgba(18, 12, 12, 0.4) 50%, transparent 100%)',
@@ -76,7 +73,6 @@ export default function HeroBanner() {
                 background: 'linear-gradient(to top, var(--color-bg-dark) 0%, transparent 100%)',
             }} />
 
-            {/* Content Container */}
             <div style={{
                 position: 'absolute', top: '50%', left: '8%', transform: 'translateY(-40%)',
                 display: 'flex', alignItems: 'flex-start', flexDirection: 'column',
@@ -84,7 +80,6 @@ export default function HeroBanner() {
             }}>
                 <div className="animate-fade-in" key={featured._id}>
 
-                    {/* Badges Row */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
                         <div style={{
                             backgroundColor: 'rgba(229, 9, 20, 0.2)',
@@ -106,7 +101,6 @@ export default function HeroBanner() {
                         )}
                     </div>
 
-                    {/* Highly Stylized Title */}
                     <h1 style={{
                         margin: '0 0 1.5rem', fontSize: 'clamp(3.5rem, 8vw, 5.5rem)',
                         fontWeight: 900, lineHeight: 1, color: 'white',
@@ -128,7 +122,6 @@ export default function HeroBanner() {
                         </p>
                     )}
 
-                    {/* Flat Buttons */}
                     <div style={{ display: 'flex', gap: '1rem' }}>
                         <Link
                             to={`/movie/${featured.imdbId || featured._id}`}

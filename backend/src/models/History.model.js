@@ -17,7 +17,6 @@ const historySchema = new mongoose.Schema({
     },
 });
 
-// Index for efficient user history queries
 historySchema.index({ user: 1, visitedAt: -1 });
 
 module.exports = mongoose.model('History', historySchema);

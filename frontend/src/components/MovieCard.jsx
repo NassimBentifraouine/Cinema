@@ -76,9 +76,7 @@ export default function MovieCard({ movie, isFavorite, onToggleFavorite, variant
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: '0.75rem' }} className="group">
-            {/* ... rest of existing grid layout ... */}
 
-            {/* Poster Container */}
             <div style={{
                 position: 'relative',
                 borderRadius: 'var(--radius-sm)',
@@ -101,7 +99,6 @@ export default function MovieCard({ movie, isFavorite, onToggleFavorite, variant
                     />
                 </Link>
 
-                {/* Top Right Rating Badge Container */}
                 <div style={{ position: 'absolute', top: '0.5rem', right: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.4rem', alignItems: 'flex-end' }}>
                     {movie.imdbRating > 0 && (
                         <GlassPanel
@@ -129,7 +126,6 @@ export default function MovieCard({ movie, isFavorite, onToggleFavorite, variant
                     )}
                 </div>
 
-                {/* Favorite button (if authenticated) */}
                 {isAuthenticated && onToggleFavorite && (
                     <Button
                         variant="ghost"
@@ -152,7 +148,6 @@ export default function MovieCard({ movie, isFavorite, onToggleFavorite, variant
                 )}
             </div>
 
-            {/* Content Below Poster */}
             <div style={{ display: 'flex', flexDirection: 'column' }}>
                 <Link to={`/movie/${movie.imdbId || movie._id}`} style={{ display: 'block' }}>
                     <h3 style={{ margin: '0 0 0.2rem', fontSize: '0.95rem', fontWeight: 700, color: 'white', lineHeight: 1.3 }} className="line-clamp-1">

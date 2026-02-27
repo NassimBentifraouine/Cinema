@@ -23,7 +23,6 @@ const ratingSchema = new mongoose.Schema({
     },
 });
 
-// One rating per user per movie
 ratingSchema.index({ user: 1, movie: 1 }, { unique: true });
 
 module.exports = mongoose.model('Rating', ratingSchema);

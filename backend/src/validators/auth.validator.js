@@ -38,7 +38,6 @@ const validate = (req, res, next) => {
         }
         return next();
     } catch (err) {
-        // Internal server error handle
         return next(err);
     }
 };

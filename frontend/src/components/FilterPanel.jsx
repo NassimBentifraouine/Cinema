@@ -21,13 +21,11 @@ export default function FilterPanel() {
 
     return (
         <GlassPanel padding="1.5rem" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-            {/* Header */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                 <SlidersHorizontal size={20} color="var(--color-accent)" />
                 <h3 style={{ fontSize: '1.1rem', fontWeight: 700, margin: 0 }}>{t('catalog.filter_title', 'Discovery Filters')}</h3>
             </div>
 
-            {/* Search */}
             <div style={{ marginBottom: '-1rem' }}>
                 <Input
                     id="filter-search"
@@ -40,7 +38,6 @@ export default function FilterPanel() {
                 />
             </div>
 
-            {/* Category */}
             <div>
                 <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-neutral-400)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>
                     {t('catalog.filter_genre', 'CATEGORY')}
@@ -64,7 +61,6 @@ export default function FilterPanel() {
                         <option value="">{t('catalog.all_genres', 'All Genres')}</option>
                         {GENRES.map(g => <option key={g} value={g}>{g}</option>)}
                     </select>
-                    {/* Custom chevron */}
                     <div style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: 'var(--color-neutral-400)' }}>
                         <svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -73,7 +69,6 @@ export default function FilterPanel() {
                 </div>
             </div>
 
-            {/* Min Rating Slider */}
             <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
                     <label style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-neutral-400)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
@@ -106,7 +101,6 @@ export default function FilterPanel() {
                 </div>
             </div>
 
-            {/* Sort By Radios */}
             <div>
                 <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-neutral-400)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>
                     {t('catalog.filter_sort', 'SORT BY')}
@@ -145,7 +139,6 @@ export default function FilterPanel() {
                 </div>
             </div>
 
-            {/* Apply Filters Button */}
             <Button
                 variant="outline"
                 style={{ width: '100%', marginTop: '0.5rem' }}
@@ -154,7 +147,6 @@ export default function FilterPanel() {
                 {t('catalog.apply_filters', 'APPLY FILTERS')}
             </Button>
 
-            {/* Soft Reset hint if applied */}
             {hasFilters && (
                 <button
                     onClick={resetFilters}
