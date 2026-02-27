@@ -82,4 +82,13 @@ const deleteRating = async (req, res) => {
     }
 };
 
-module.exports = { addFavorite, removeFavorite, getFavorites, rateMovie, getRatings, getHistory, recordHistory, deleteRating };
+const updateProfile = async (req, res) => {
+    try {
+        const user = await userService.updateProfile(req.user._id, req.body);
+        res.json({ message: 'Profil mis à jour', user });
+    } catch (error) {
+        res.status(error.statusCode || 500).json({ message: error.message });
+    }
+};
+
+module.exports = { addFavorite, removeFavorite, getFavorites, rateMovie, getRatings, getHistory, recordHistory, deleteRating, updateProfile };

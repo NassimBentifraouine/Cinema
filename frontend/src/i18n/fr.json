@@ -102,6 +102,7 @@
         "favorites": "Mes Favoris",
         "ratings": "Mes Notes",
         "history": "Mon Historique",
+        "account": "Mon Compte",
         "no_favorites": "Aucun favori pour l'instant",
         "no_ratings": "Vous n'avez pas encore noté de film",
         "no_history": "Votre historique est vide",
@@ -174,5 +175,17 @@
         "passwords_match": "Les mots de passe doivent correspondre",
         "login_failed": "Email ou mot de passe incorrect",
         "server_error": "Erreur serveur, veuillez réessayer"
+    },
+    "profile": {
+        "title": "Mon Compte",
+        "subtitle": "Gérez les informations de votre compte et votre sécurité.",
+        "email_label": "Adresse Email",
+        "security_section": "Sécurité & Mot de passe",
+        "current_password_label": "Mot de passe actuel",
+        "new_password_label": "Nouveau mot de passe",
+        "confirm_password_label": "Confirmer le nouveau mot de passe",
+        "save_button": "METTRE À JOUR LE PROFIL",
+        "update_success": "Profil mis à jour avec succès !",
+        "password_mismatch": "Les nouveaux mots de passe ne correspondent pas"
     }
 }

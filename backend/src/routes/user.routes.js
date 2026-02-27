@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { addFavorite, removeFavorite, getFavorites, rateMovie, getRatings, getHistory, recordHistory, deleteRating } = require('../controllers/user.controller');
+const { addFavorite, removeFavorite, getFavorites, rateMovie, getRatings, getHistory, recordHistory, deleteRating, updateProfile } = require('../controllers/user.controller');
 const authMiddleware = require('../middleware/auth.middleware');
 
 // All user routes require authentication
@@ -16,5 +16,7 @@ router.delete('/ratings/:movieId', deleteRating);
 
 router.post('/history/:movieId', recordHistory);
 router.get('/history', getHistory);
+
+router.put('/profile', updateProfile);
 
 module.exports = router;

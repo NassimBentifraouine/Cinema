@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { User, LogOut, Settings } from 'lucide-react';
+import { User, LogOut, Settings, UserCog } from 'lucide-react';
 import { useAuthStore } from '../store/auth.store';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 
@@ -63,9 +63,6 @@ export default function Navbar() {
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <NavLink to="/" active={location.pathname === '/'}>{t('nav.catalog')}</NavLink>
-                    {isAdmin() && (
-                        <NavLink to="/admin" color="var(--color-accent)" active={location.pathname.startsWith('/admin')}>{t('nav.admin')}</NavLink>
-                    )}
                 </div>
             </div>
 
@@ -110,7 +107,11 @@ export default function Navbar() {
                                 e.currentTarget.style.transform = 'translateY(0)';
                             }}
                         >
-                            <span style={{ fontWeight: 700, fontSize: '0.85rem', letterSpacing: '0.05em' }}>{t('nav.dashboard')}</span>
+                            <span style={{ fontWeight: 700, fontSize: '0.85rem', letterSpacing: '0.05em' }}>
+                                {location.pathname === '/admin' ? t('nav.admin') :
+                                    location.pathname === '/profile' ? t('dashboard.account') :
+                                        t('nav.dashboard')}
+                            </span>
                             <UserAvatar />
                         </button>
 
@@ -215,6 +216,11 @@ function UserMenu({ user, isAdmin, onLogout, t, onClose }) {
                     <span>{t('nav.admin')}</span>
                 </Link>
             )}
+
+            <Link to="/profile" onClick={onClose} style={itemStyle} onMouseEnter={e => handleHover(e, true)} onMouseLeave={e => handleHover(e, false)}>
+                <UserCog size={18} style={{ opacity: 0.8 }} />
+                <span>{t('dashboard.account')}</span>
+            </Link>
 
             <hr style={{ border: 'none', borderTop: '1px solid rgba(255,255,255,0.06)', margin: '0.5rem 0' }} />
 
