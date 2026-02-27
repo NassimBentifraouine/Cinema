@@ -60,7 +60,7 @@ export default function MovieDetailPage() {
         try {
             await userApi.rateMovie(movie._id, score);
             setUserRating(score);
-            moviesApi.getOne(id).then(r => setMovie(r.data)).catch(() => { }); // Refresh stats
+            moviesApi.getOne(id).then(r => setMovie(r.data)).catch(() => { });
             toast({ message: `${score}/10!`, type: 'success' });
         } catch (err) {
             toast({ message: err.response?.data?.message || t('errors.server_error'), type: 'error' });
@@ -74,7 +74,7 @@ export default function MovieDetailPage() {
         try {
             await userApi.deleteRating(movie._id);
             setUserRating(0);
-            moviesApi.getOne(id).then(r => setMovie(r.data)).catch(() => { }); // Refresh stats
+            moviesApi.getOne(id).then(r => setMovie(r.data)).catch(() => { });
             toast({ message: t('movie.remove_rating'), type: 'info' });
         } catch (err) {
             toast({ message: err.response?.data?.message || t('errors.server_error'), type: 'error' });
@@ -127,7 +127,6 @@ export default function MovieDetailPage() {
 
     return (
         <main className="animate-fade-in-slow" style={{ minHeight: '100vh', paddingBottom: '4rem' }}>
-            {/* Top Background Hero Section */}
             <div style={{ position: 'relative', width: '100%', height: '70vh', minHeight: '550px', overflow: 'hidden' }}>
                 <div
                     style={{
@@ -147,13 +146,10 @@ export default function MovieDetailPage() {
                 />
             </div>
 
-            {/* Main Content overlapping the hero */}
             <div style={{ maxWidth: '1400px', margin: '-45vh auto 0', padding: '0 4%', position: 'relative', zIndex: 10 }}>
 
-                {/* Top Section Layout: Poster on left, Info on right */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'minmax(300px, 350px) 1fr', gap: '5rem', alignItems: 'end', marginBottom: '5rem' }}>
 
-                    {/* Left: Premium Framed Poster */}
                     <div style={{ position: 'relative', transition: 'transform 0.5s ease' }}>
                         <div style={{
                             background: '#fff',
@@ -175,10 +171,8 @@ export default function MovieDetailPage() {
                         </div>
                     </div>
 
-                    {/* Right: Info Area */}
                     <div style={{ paddingBottom: '2rem' }}>
 
-                        {/* Breadcrumbs-ish / Meta */}
                         <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem', flexWrap: 'wrap', marginBottom: '2rem', fontWeight: 700, fontSize: '0.85rem', letterSpacing: '0.05em' }}>
                             <GlassPanel padding="0.4rem 0.8rem" borderRadius="var(--radius-sm)" style={{ color: 'var(--color-accent)', fontWeight: 700, textTransform: 'uppercase', fontSize: '0.85rem' }}>
                                 {displayGenre?.length > 0 ? displayGenre.join(' / ') : 'MOVIE'}
@@ -193,7 +187,6 @@ export default function MovieDetailPage() {
                             </div>
                         </div>
 
-                        {/* Cinematic Title */}
                         <h1 style={{
                             margin: '0 0 2.5rem',
                             fontSize: 'clamp(3.5rem, 8vw, 5.5rem)',
@@ -208,9 +201,7 @@ export default function MovieDetailPage() {
                         </h1>
 
                         <div style={{ display: 'flex', alignItems: 'flex-start', gap: '4rem', flexWrap: 'wrap' }}>
-                            {/* Dual Rating Block */}
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                                {/* IMDb Rating */}
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
                                     <div style={{
                                         display: 'inline-flex',
@@ -238,7 +229,6 @@ export default function MovieDetailPage() {
                                     </div>
                                 </div>
 
-                                {/* Community Rating */}
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
                                     <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--color-neutral-400)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>{t('movie.community_score', 'UTILISATEURS')}</span>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
@@ -259,7 +249,6 @@ export default function MovieDetailPage() {
                                 </div>
                             </div>
 
-                            {/* Actions Column */}
                             {isAuthenticated && (
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', minWidth: '350px' }}>
                                     <Button
@@ -273,7 +262,6 @@ export default function MovieDetailPage() {
                                         {isFavorite ? t('movie.in_watchlist') : t('movie.add_to_watchlist')}
                                     </Button>
 
-                                    {/* Mini Rating Module */}
                                     <GlassPanel padding="1.5rem" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                             <h3 style={{ margin: 0, fontSize: '0.8rem', fontWeight: 800, textTransform: 'uppercase', color: 'var(--color-neutral-400)', letterSpacing: '0.1em' }}>{t('movie.rate_movie')}</h3>
@@ -299,9 +287,7 @@ export default function MovieDetailPage() {
                     </div>
                 </div>
 
-                {/* Bottom Content Section */}
                 <div style={{ marginTop: '4rem' }}>
-                    {/* Full Width: Plot & Info */}
                     <div>
                         <div style={{ marginBottom: '4rem' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>

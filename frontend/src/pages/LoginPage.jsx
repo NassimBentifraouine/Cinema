@@ -54,7 +54,6 @@ export default function LoginPage() {
             display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '80px 1rem 2rem',
             position: 'relative', overflow: 'hidden'
         }}>
-            {/* Cinematic Theater Background */}
             <div style={{
                 position: 'absolute', inset: 0, zIndex: -1,
                 backgroundImage: 'url("https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=2070&auto=format&fit=crop")',
@@ -62,14 +61,12 @@ export default function LoginPage() {
                 filter: 'brightness(0.3) contrast(1.2)'
             }} />
 
-            {/* Dark overlay gradient */}
             <div style={{
                 position: 'absolute', inset: 0, zIndex: -1,
                 background: 'linear-gradient(to top, var(--color-bg-dark) 0%, transparent 100%)',
             }} />
 
             <GlassPanel style={{ width: '100%', maxWidth: '440px' }}>
-                {/* Header */}
                 <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
                     <h1 style={{ margin: '0 0 0.5rem', fontSize: '2rem', fontWeight: 900, fontFamily: 'var(--font-family-heading)', letterSpacing: '-0.02em', color: 'white' }}>{t('auth.login_title')}</h1>
                     <p style={{ margin: 0, color: 'var(--color-neutral-400)', fontSize: '0.95rem' }}>{t('auth.login_subtitle')}</p>

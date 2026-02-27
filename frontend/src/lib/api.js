@@ -6,7 +6,6 @@ const api = axios.create({
     headers: { 'Content-Type': 'application/json' },
 });
 
-// Attach token automatically
 api.interceptors.request.use((config) => {
     const token = useAuthStore.getState().token;
     if (token) {
@@ -15,7 +14,6 @@ api.interceptors.request.use((config) => {
     return config;
 });
 
-// Handle 401 globally
 api.interceptors.response.use(
     (response) => response,
     (error) => {
@@ -26,14 +24,12 @@ api.interceptors.response.use(
     }
 );
 
-// ─── Auth ───
 export const authApi = {
     register: (data) => api.post('/auth/register', data),
     login: (data) => api.post('/auth/login', data),
     me: () => api.get('/auth/me'),
 };
 
-// ─── Movies ───
 export const moviesApi = {
     getAll: (params) => api.get('/movies', { params }),
     getOne: (id) => api.get(`/movies/${id}`),
@@ -47,7 +43,6 @@ export const moviesApi = {
     deleteComment: (commentId) => api.delete(`/movies/comments/${commentId}`),
 };
 
-// ─── User ───
 export const userApi = {
     getFavorites: () => api.get('/users/favorites'),
     addFavorite: (movieId) => api.post(`/users/favorites/${movieId}`),

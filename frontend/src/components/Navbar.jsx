@@ -57,7 +57,6 @@ export default function Navbar() {
 
     return (
         <nav style={navStyle}>
-            {/* Left side: Logo & Primary Links */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '2.5rem' }}>
                 <Logo height={scrolled ? '28px' : '36px'} />
 
@@ -66,10 +65,8 @@ export default function Navbar() {
                 </div>
             </div>
 
-            {/* Right side: Language, Login/Profile Pill */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
 
-                {/* Language Toggles */}
                 <div style={{
                     display: 'flex', gap: '0.2rem', alignItems: 'center',
                     background: 'rgba(0,0,0,0.4)', padding: '0.3rem',
@@ -135,7 +132,6 @@ export default function Navbar() {
                 )}
             </div>
 
-            {/* Click outside overlay */}
             {userMenuOpen && (
                 <div style={{ position: 'fixed', inset: 0, zIndex: 40 }} onClick={() => setUserMenuOpen(false)} />
             )}
@@ -150,7 +146,6 @@ export default function Navbar() {
     );
 }
 
-// Internal Sub-components for cleaner structure
 function UserAvatar() {
     return (
         <div style={{
@@ -193,7 +188,6 @@ function UserMenu({ user, isAdmin, onLogout, t, onClose }) {
             animation: 'slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
             border: '1px solid rgba(255,255,255,0.12)'
         }}>
-            {/* Header: User Email */}
             <div style={{
                 padding: '0.5rem 1.25rem 1rem',
                 fontSize: '0.85rem',
@@ -204,7 +198,6 @@ function UserMenu({ user, isAdmin, onLogout, t, onClose }) {
                 <div style={{ color: 'white', fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user?.email}</div>
             </div>
 
-            {/* Menu Links */}
             <Link to="/dashboard" onClick={onClose} style={itemStyle} onMouseEnter={e => handleHover(e, true)} onMouseLeave={e => handleHover(e, false)}>
                 <User size={18} style={{ opacity: 0.8 }} />
                 <span>{t('nav.dashboard')}</span>
@@ -224,7 +217,6 @@ function UserMenu({ user, isAdmin, onLogout, t, onClose }) {
 
             <hr style={{ border: 'none', borderTop: '1px solid rgba(255,255,255,0.06)', margin: '0.5rem 0' }} />
 
-            {/* Logout Button */}
             <button
                 onClick={onLogout}
                 style={{ ...itemStyle, color: '#ff4d4d' }}

@@ -38,7 +38,6 @@ export default function ProfileSettings() {
                 newPassword: formData.newPassword || undefined
             });
 
-            // Update local user state with the user returned from backend
             setAuth({ user: res.data.user, token });
 
             toast({ message: t('profile.update_success'), type: 'success' });

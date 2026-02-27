@@ -59,7 +59,6 @@ const addHistory = async (userId, movieId) => {
             { upsert: true }
         );
     } catch (err) {
-        // Silently ignore history errors for unknown movies
     }
 };
 
@@ -80,7 +79,6 @@ const updateProfile = async (userId, data) => {
     const user = await User.findById(userId).select('+password');
     if (!user) throw new Error('User not found');
 
-    // 1. Check current password if updating password OR email
     if (currentPassword) {
         const isMatch = await user.comparePassword(currentPassword);
         if (!isMatch) {
@@ -89,13 +87,11 @@ const updateProfile = async (userId, data) => {
             throw err;
         }
     } else if (newPassword || (email && email !== user.email)) {
-        // Require password for sensitive changes
         const err = new Error('Mot de passe actuel requis pour modifier ces informations');
         err.statusCode = 400;
         throw err;
     }
 
-    // 2. Handle email update
     if (email && email !== user.email) {
         const existing = await User.findOne({ email });
         if (existing) {
@@ -106,7 +102,6 @@ const updateProfile = async (userId, data) => {
         user.email = email;
     }
 
-    // 3. Handle password update
     if (newPassword) {
         if (newPassword.length < 8) {
             const err = new Error('Le nouveau mot de passe doit faire au moins 8 caractères');
@@ -117,7 +112,7 @@ const updateProfile = async (userId, data) => {
     }
 
     await user.save();
-    return User.findById(userId); // Return without password
+    return User.findById(userId);
 };
 
 module.exports = { addFavorite, removeFavorite, getFavorites, rateMovie, getRatings, deleteRating, addHistory, getHistory, updateProfile };

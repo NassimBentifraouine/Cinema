@@ -3,7 +3,6 @@ const router = express.Router();
 const { addFavorite, removeFavorite, getFavorites, rateMovie, getRatings, getHistory, recordHistory, deleteRating, updateProfile } = require('../controllers/user.controller');
 const authMiddleware = require('../middleware/auth.middleware');
 
-// All user routes require authentication
 router.use(authMiddleware);
 
 router.post('/favorites/:movieId', addFavorite);

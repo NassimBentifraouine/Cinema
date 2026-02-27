@@ -68,7 +68,6 @@ const movieSchema = new mongoose.Schema({
         type: [String],
         default: [],
     },
-    // Custom poster uploaded by admin
     customPoster: {
         type: String,
         default: '',
@@ -81,7 +80,6 @@ const movieSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
-    // Dynamically added by aggregation
     communityRating: {
         type: Number,
         default: 0,
@@ -92,7 +90,6 @@ const movieSchema = new mongoose.Schema({
     },
 });
 
-// Text index for search
 movieSchema.index({ title: 'text', plot: 'text' }, { language_override: 'dummyLanguage' });
 
 module.exports = mongoose.model('Movie', movieSchema);

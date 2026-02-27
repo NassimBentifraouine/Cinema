@@ -4,7 +4,6 @@ const omdbService = require('../services/omdb.service');
 const getMovies = async (req, res) => {
     try {
         const { search, genre, minRating, sort, page, limit } = req.query;
-        // Don't auto-import from OMDb if Admin is searching (they manage their own collection)
         const autoImport = req.user?.role !== 'ADMIN';
         const result = await movieService.getMovies({ search, genre, minRating, sort, page, limit, autoImport });
         res.json(result);

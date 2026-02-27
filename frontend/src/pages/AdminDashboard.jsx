@@ -23,7 +23,6 @@ export default function AdminDashboard() {
     const [editMovie, setEditMovie] = useState(null);
     const [deleteId, setDeleteId] = useState(null);
 
-    // Debounce search
     useEffect(() => {
         const timer = setTimeout(() => {
             setDebouncedSearch(search);
@@ -50,7 +49,7 @@ export default function AdminDashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
-        fetchMovies(loading && search === ''); // Only full loading on first mount
+        fetchMovies(loading && search === '');
     }, [debouncedSearch, page]);
 
     const openCreate = () => { setEditMovie(null); setModalOpen(true); };
@@ -97,7 +96,6 @@ export default function AdminDashboard() {
 
     return (
         <main style={{ width: '92%', maxWidth: '1400px', margin: '0 auto', padding: '160px 0 4rem' }} className="animate-fade-in">
-            {/* Page Header */}
             <header style={{ marginBottom: '3.5rem', textAlign: 'left' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.5rem' }}>
                     <div style={{ width: '32px', height: '2px', backgroundColor: 'var(--color-accent)' }} />
@@ -120,7 +118,6 @@ export default function AdminDashboard() {
                 </p>
             </header>
 
-            {/* Premium Action Bar */}
             <GlassPanel padding="1.25rem 1.5rem" borderRadius="var(--radius-xl)" style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -170,7 +167,6 @@ export default function AdminDashboard() {
                 </Button>
             </GlassPanel>
 
-            {/* Table */}
             <GlassPanel padding="0" style={{ border: '1px solid var(--color-neutral-800)', overflow: 'hidden' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse' }} aria-label="Gestion des films">
                     <thead>
@@ -229,7 +225,6 @@ export default function AdminDashboard() {
                     </tbody>
                 </table>
 
-                {/* Table pagination */}
                 {total > 15 && (
                     <div style={{ padding: '0.75rem 1rem', borderTop: '1px solid var(--color-neutral-800)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <span style={{ fontSize: '0.8rem', color: 'var(--color-neutral-400)' }}>{t('admin.page_info_admin', { page, total })}</span>
@@ -241,7 +236,6 @@ export default function AdminDashboard() {
                 )}
             </GlassPanel>
 
-            {/* Create/Edit Modal */}
             {
                 modalOpen && (
                     <ModalOverlay onClose={handleModalBg}>
@@ -250,7 +244,6 @@ export default function AdminDashboard() {
                 )
             }
 
-            {/* Confirm Delete Modal */}
             {
                 deleteId && (
                     <ModalOverlay onClose={() => setDeleteId(null)}>
@@ -324,7 +317,6 @@ const MovieForm = ({ initial, onSave, onClose, t }) => {
                     setShowSuggestions(false);
                 }
             } catch (err) {
-                // Silently ignore or show UI error
             }
         }, 400);
     };
@@ -441,7 +433,6 @@ const MovieForm = ({ initial, onSave, onClose, t }) => {
             </div>
 
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                {/* Ligne 1: Titre & ID IMDb */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '1.25rem' }}>
                     <div style={{ position: 'relative' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
@@ -496,31 +487,26 @@ const MovieForm = ({ initial, onSave, onClose, t }) => {
                     {inputGroup('imdbId', 'ID IMDb', { placeholder: 'tt0000000' })}
                 </div>
 
-                {/* Ligne 2: Titre VO & Année */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '1.25rem' }}>
                     {inputGroup('titleVO', t('admin.title_vo', 'Titre Original (VO)'), { placeholder: 'Original Title' })}
                     {inputGroup('year', t('admin.year_field'), { placeholder: '2026' })}
                 </div>
 
-                {/* Ligne 3: Genres & Genres VO */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
                     {inputGroup('genre', t('admin.genre_field'), { placeholder: 'Action, Drame' })}
                     {inputGroup('genreVO', t('admin.genre_vo', 'Genres (VO)'), { placeholder: 'Action, Drama' })}
                 </div>
 
-                {/* Ligne 4: Catégories & Poster URL */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '1.25rem' }}>
                     {inputGroup('categories', t('admin.categories_field'), { placeholder: 'Blockbuster...' })}
                     {inputGroup('poster', t('admin.poster_url', 'URL de l\'affiche'), { placeholder: 'https://...' })}
                 </div>
 
-                {/* Ligne 5: Synopsis FR & VO (Side by Side) */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
                     {inputGroup('plot', t('admin.plot_fr', 'Synopsis (FR)'), { textarea: true, rows: 2, placeholder: 'Résumé...' })}
                     {inputGroup('plotVO', t('admin.plot_vo', 'Synopsis (VO)'), { textarea: true, rows: 2, placeholder: 'Summary...' })}
                 </div>
 
-                {/* Section Upload & Footer simplifiée */}
                 <div style={{
                     display: 'flex',
                     alignItems: 'center',

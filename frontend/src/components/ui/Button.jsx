@@ -5,8 +5,8 @@ export default function Button({
     children,
     onClick,
     to,
-    variant = 'primary', // primary, secondary, outline, ghost
-    size = 'md',        // sm, md, lg
+    variant = 'primary',
+    size = 'md',
     pill = false,
     className = '',
     style = {},

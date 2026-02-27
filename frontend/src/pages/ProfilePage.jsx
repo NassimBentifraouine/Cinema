@@ -9,7 +9,6 @@ export default function ProfilePage() {
 
     return (
         <main style={{ width: '92%', maxWidth: '1400px', margin: '0 auto', padding: '160px 0 4rem', position: 'relative' }} className="animate-fade-in">
-            {/* Page Header - Centered Style */}
             <header style={{ marginBottom: '4rem', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
                     <div style={{ width: '32px', height: '2px', backgroundColor: 'var(--color-accent)' }} />

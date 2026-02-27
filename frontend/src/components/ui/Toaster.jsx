@@ -9,7 +9,6 @@ let externalToast = null;
 export function useToast() {
     const ctx = useContext(ToastContext);
     if (ctx) return ctx;
-    // fallback for usage outside provider
     return { toast: externalToast || (() => { }) };
 }
 
@@ -28,7 +27,6 @@ export function Toaster() {
         setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), duration);
     }, []);
 
-    // Expose globally
     useEffect(() => { externalToast = toast; }, [toast]);
 
     return (
