@@ -139,13 +139,6 @@ export default function FilterPanel() {
                 </div>
             </div>
 
-            <Button
-                variant="outline"
-                style={{ width: '100%', marginTop: '0.5rem' }}
-                onClick={() => { }}
-            >
-                {t('catalog.apply_filters', 'APPLY FILTERS')}
-            </Button>
 
             {hasFilters && (
                 <button

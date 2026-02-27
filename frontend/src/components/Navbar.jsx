@@ -44,7 +44,7 @@ export default function Navbar() {
         background: scrolled ? 'linear-gradient(180deg, rgba(15,15,15,0.7) 0%, rgba(5,5,5,0.85) 100%)' : 'linear-gradient(180deg, rgba(15,15,15,0.2) 0%, rgba(5,5,5,0.5) 100%)',
         backdropFilter: 'blur(24px) saturate(200%)',
         transition: 'all 0.5s cubic-bezier(0.19, 1, 0.22, 1)',
-        padding: '0 1.5rem',
+        padding: '0 2rem',
         height: scrolled ? '60px' : '76px',
         display: 'flex',
         alignItems: 'center',
@@ -57,7 +57,7 @@ export default function Navbar() {
 
     return (
         <nav style={navStyle}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '2.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
                 <Logo height={scrolled ? '28px' : '36px'} />
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
